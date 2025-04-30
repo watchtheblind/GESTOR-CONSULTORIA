@@ -1,0 +1,276 @@
+
+    /* --- aquí va todo el CSS que tenías en <style> ... --- */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      color: #333;
+      background: #f9f9f9;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      background: #fff;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #004080;
+      color: #fff;
+      padding: 0.5rem 1rem;
+    }
+    .branding { display: flex; align-items: center; }
+    .branding svg { height: 40px; margin-right: 0.5rem; }
+    .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; }
+    .top-actions { display: flex; align-items: center; gap: 1rem; }
+    .top-actions a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+    .layout { display: flex; flex: 1; overflow: hidden; }
+    .sidebar {
+      width: 200px;
+      background: #f4f4f4;
+      padding: 1rem;
+      transition: left 0.3s;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .sidebar ul { list-style: none; }
+    .sidebar li { margin-bottom: 1rem; }
+    .sidebar a {
+      text-decoration: none;
+      color: #333;
+      font-size: 1.3rem;
+    }
+    .content { flex: 1; padding: 1.5rem; overflow-y: auto; }
+    footer {
+      background: #004080;
+      color: #fff;
+      padding: 1rem;
+    }
+    .footer-links {
+      list-style: none;
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+    .mobile-nav { list-style: none; display: none; }
+    .mobile-nav li { margin-bottom: 0.5rem; }
+    .mobile-nav a {
+      color: #333;
+      font-size: 1.3rem;
+      text-decoration: none;
+    }
+	
+	
+/* -------------  CHAT ------------- */
+
+
+
+/* Contenedor principal del foro */
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden; /* Mantenemos el overflow hidden */
+    background: #fff;
+}
+
+/* Área de mensajes con scroll invisible */
+.chat-messages {
+    flex: 1;
+    padding: 0;
+    overflow-y: scroll; /* Cambiamos a scroll (siempre activo) */
+    scrollbar-width: none; /* Para Firefox */
+    -ms-overflow-style: none; /* Para IE/Edge */
+}
+
+/* Ocultar scrollbar en Chrome/Safari */
+.chat-messages::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    background: transparent;
+}
+
+/* Resto de tus estilos se mantienen igual... */
+.message {
+    margin: 0;
+    padding: 1.5rem;
+    border-bottom: 1px solid #eee;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.message-other {
+    background: #fafafa;
+}
+
+.message-user {
+    background: #fff;
+}
+/* Cabecera del mensaje */
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.message-author {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.message-date {
+    color: #7f8c8d;
+    font-size: 0.85rem;
+}
+
+/* Contenido del mensaje */
+.message-content {
+    padding: 0.25rem 0;
+}
+
+/* Campo de entrada (mantenido como en el chat original) */
+.chat-input {
+    display: flex;
+    border-top: 1px solid #ddd;
+    background: #fff;
+    padding: 0;
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+}
+
+.chat-input button {
+    padding: 0 1.5rem;
+    background: #3498db;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.chat-input button:hover {
+    background: #2980b9;
+}
+
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem;margin-top:30px}
+.card,.logs{background:#fff;padding:1.5rem;border-radius:8px; box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);}
+.card h2{font-size:1rem;color:#7f8c8d;margin:.5rem;}
+.card p{font-size:1.8rem;font-weight:bold;color:#2c3e50;}
+
+  /* Contenedor wrapper para centrado vertical y horizontal */
+  .login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  /* Estilos del formulario de login (tus estilos originales) */
+  .login-container {
+    width: 400px;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  .login-container h1 {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    color: #004080;
+  }
+  .login-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .login-container input {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .login-container button {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    background: #004080;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .login-container button:hover {
+    background: #003060;
+  }
+  .recover {
+    margin-top: 1rem;
+  }
+  .recover button {
+    background: none;
+    border: none;
+    color: #004080;
+    font-size: 0.9rem;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .signup-link {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+  }
+  .signup-link a {
+    color: #004080;
+    text-decoration: none;
+  }
+  .signup-link a:hover {
+    text-decoration: underline;
+  }
+  
+  
+    @media (max-width: 768px) {
+      .top-actions { display: none; }
+      .menu-toggle { display: block; }
+      .sidebar {
+        position: fixed;
+        top: 56px;
+        left: -200px;
+        height: calc(100% - 56px);
+        z-index: 1000;
+      }
+      .sidebar.open { left: 0; }
+      .layout { flex-direction: column; }
+      .mobile-nav { display: block; }
+      .footer-links {
+        display: grid;
+        grid-template-columns: auto auto;
+        gap: 1rem;
+        justify-content: center;
+      }
+    }
+ 

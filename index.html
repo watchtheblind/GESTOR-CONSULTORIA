@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSM – Inicio</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        header {
+            background: #0a2463; /* azul oscuro corporativo */
+            color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        main {
+            height: calc(100vh - 60px); /* ocupa todo menos la cabecera */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f5f7fa; /* gris muy claro */
+            padding: 20px;
+        }
+
+        .form-wrapper {
+            background: #fff;
+            padding: 40px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 320px;
+            text-align: center;
+        }
+
+        .form-wrapper h2 {
+            margin-bottom: 20px;
+            color: #0a2463;
+        }
+
+        .form-wrapper input[type="text"],
+        .form-wrapper input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .form-wrapper button {
+            width: 100%;
+            padding: 12px;
+            background: #0a2463;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .form-wrapper button:hover {
+            background: #143b8a; /* tono más claro al hacer hover */
+        }
+
+        .recover {
+            display: block;
+            margin: 15px 0;
+            color: #0a2463;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .recover:hover {
+            text-decoration: underline;
+        }
+
+        .cta {
+            display: block;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .cta a {
+            color: #0a2463;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .cta a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">LOGO</div>
+        <nav>
+            <ul>
+                <li><a href="#">Inicio</a></li>
+                <li><a href="#">Características</a></li>
+                <li><a href="#">Precios</a></li>
+                <li><a href="#">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="form-wrapper">
+            <h2>Acceso a clientes</h2>
+            <form action="#" method="post">
+                <input type="text" name="usuario" placeholder="Usuario" required />
+                <input type="password" name="password" placeholder="Contraseña" required />
+                <button type="submit">Ingresar</button>
+            </form>
+            <a href="#" class="recover">Recuperar contraseña</a>
+            <span class="cta">¿Si no eres cliente <a href="#">adquiera uno de nuestros servicios aquí</a></span>
+        </div>
+    </main>
+</body>
+</html>

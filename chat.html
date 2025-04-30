@@ -1,0 +1,388 @@
+
+<body>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Demo</title>
+    <div class="wrapper">
+<header>
+   <div class="header-inner">
+      <div class="header-left">
+         <div class="logo">LOGO</div>
+         <div class="brand">Admin Panel</div>
+      </div>
+
+      <nav class="user-nav">
+         <ul>
+            <li><a href="#">Mi perfil</a></li>
+            <li><a href="#">Cerrar sesión</a></li>
+         </ul>
+      </nav>
+
+      <button id="toggle-menu" class="menu-btn" aria-label="Menú">&#9776;</button>
+   </div>
+</header>
+
+        <div class="main-container">
+            <aside>
+                <nav class="nav">
+                    <ul>
+                        <li><a href="#">Dashboard</a></li>
+						<li><a href="#">Consultores</a></li>
+                        <li><a href="#">Clientes</a></li>
+                        <li><a href="#">Proyectos</a></li>
+                        <li><a href="#">Tareas</a></li>
+                        <li><a href="#">Mensajes</a></li>
+                        <li><a href="#">Archivos</a></li>
+                        <li><a href="#">Usuarios</a></li>
+                        <li><a href="#">Configuración</a></li>
+                    </ul>
+                </nav>
+                
+                <!-- Menú de usuario para móvil -->
+                <div class="user-nav-mobile">
+                    <ul>
+                        <li><a href="#">Mi perfil</a></li>
+                        <li><a href="#">Cerrar sesión</a></li>
+                    </ul>
+                </div>
+            </aside>
+<!-- Estas opciones sólo aparecen en el Dashboard a la que llega el usuario apenas se loguea.
+            <main>
+                <h1>Resumen sistema</h1>
+                <section class="cards">
+                    <div class="card">
+                        <h2>Proyectos activos</h2>
+                        <p>42</p>
+                    </div>
+                    <div class="card">
+                        <h2>Tareas pendientes</h2>
+                        <p>87</p>
+                    </div>
+                    <div class="card">
+                        <h2>Nuevos mensajes</h2>
+                        <p>5</p>
+                    </div>
+                </section>
+-->
+                <section class="logs">
+                    <h2>Asunto (Título, nombre o asunto por el que se inició la conversación)</h2>
+                    <div class="chat-container">
+                        <div class="chat-messages" id="chat-messages">
+                            <!-- Mensajes aparecerán aquí -->
+                        </div>
+                        <div class="chat-input">
+                            <input type="text" id="message-input" placeholder="Escribe tu mensaje...">
+                            <button id="send-button">Enviar</button>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatMessages = document.getElementById('chat-messages');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        
+        // Cargar mensajes guardados o demo si no hay
+        const savedMessages = JSON.parse(localStorage.getItem('chatMessages'));
+        if (!savedMessages || savedMessages.length === 0) {
+            loadDemoMessages();
+        } else {
+            loadMessages();
+        }
+        
+        // Enviar mensaje al hacer clic en el botón
+        sendButton.addEventListener('click', sendMessage);
+        
+        // Enviar mensaje al presionar Enter
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Toggle del menú en móviles
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+        });
+        
+        // Cerrar menú al hacer clic en un enlace (en móviles)
+        document.querySelectorAll('.nav a').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+        
+        function loadDemoMessages() {
+            const demoMessages = [
+                {
+                    type: 'user',
+                    sender: 'Tú',
+                    text: 'Hola, tengo un problema con el sistema. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+                    timestamp: new Date(Date.now() - 3600000).toISOString()
+                },
+                {
+                    type: 'other',
+                    sender: 'Soporte',
+                    text: 'Gracias por contactarnos. Hemos recibido tu mensaje. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.',
+                    timestamp: new Date(Date.now() - 1800000).toISOString()
+                },
+                {
+                    type: 'user',
+                    sender: 'Tú',
+                    text: 'El problema persiste cuando intento subir archivos. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+                    timestamp: new Date(Date.now() - 900000).toISOString()
+                },
+                {
+                    type: 'other',
+                    sender: 'Soporte',
+                    text: 'Entendido, estamos investigando el issue. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.',
+                    timestamp: new Date().toISOString()
+                }
+            ];
+            
+            // Guardar mensajes demo
+            localStorage.setItem('chatMessages', JSON.stringify(demoMessages));
+            
+            // Cargar mensajes
+            loadMessages();
+        }
+        
+        function sendMessage() {
+            const messageText = messageInput.value.trim();
+            if (messageText === '') return;
+            
+            // Crear y mostrar mensaje del usuario
+            addMessage('user', 'Tú', messageText);
+            
+            // Guardar mensaje
+            saveMessage('user', 'Tú', messageText);
+            
+            // Limpiar input
+            messageInput.value = '';
+            
+            // Simular respuesta después de un breve retraso
+            setTimeout(simulateResponse, 1000);
+        }
+        
+        function simulateResponse() {
+            const responses = [
+                "Gracias por tu mensaje. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                "Hemos registrado tu consulta. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+                "Nuestro equipo está trabajando en ello. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+            ];
+            
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            
+            // Crear y mostrar mensaje del sistema
+            addMessage('other', 'Soporte', randomResponse);
+            
+            // Guardar mensaje
+            saveMessage('other', 'Soporte', randomResponse);
+        }
+        
+        function addMessage(type, sender, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', `message-${type}`);
+            
+            const messageText = document.createElement('div');
+            messageText.textContent = text;
+            
+            const messageInfo = document.createElement('div');
+            messageInfo.classList.add('message-info');
+            messageInfo.textContent = `${sender} • ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+            
+            messageDiv.appendChild(messageText);
+            messageDiv.appendChild(messageInfo);
+            
+            chatMessages.appendChild(messageDiv);
+            
+            // Auto-scroll al último mensaje
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function saveMessage(type, sender, text) {
+            // Obtener mensajes existentes o crear un nuevo array
+            let messages = JSON.parse(localStorage.getItem('chatMessages')) || [];
+            
+            // Añadir nuevo mensaje
+            messages.push({
+                type,
+                sender,
+                text,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Guardar en localStorage
+            localStorage.setItem('chatMessages', JSON.stringify(messages));
+        }
+        
+        function loadMessages() {
+            const messages = JSON.parse(localStorage.getItem('chatMessages')) || [];
+            
+            messages.forEach(msg => {
+                // Usar la hora guardada o la actual si no existe
+                const time = msg.timestamp ? 
+                    new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 
+                    new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message', `message-${msg.type}`);
+                
+                const messageText = document.createElement('div');
+                messageText.textContent = msg.text;
+                
+                const messageInfo = document.createElement('div');
+                messageInfo.classList.add('message-info');
+                messageInfo.textContent = `${msg.sender} • ${time}`;
+                
+                messageDiv.appendChild(messageText);
+                messageDiv.appendChild(messageInfo);
+                
+                chatMessages.appendChild(messageDiv);
+            });
+            
+            // Auto-scroll al último mensaje
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    });
+	document.getElementById('toggle-menu')
+        .addEventListener('click',()=>document.querySelector('aside').classList.toggle('open'));
+
+</script>
+</body>
+</html>
+</body>
+</html>
+<style>
+/* -------------  RESETS ------------- */
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Arial,sans-serif;}
+body{background:#f5f5f5;color:#333;}
+
+/* -------------  WRAPPER ------------- */
+.wrapper{
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+    max-width:1200px;
+    margin:0 auto;
+}
+.main-container{display:flex;flex:1;min-height:0;}
+
+/* -------------  HEADER ------------- */
+header{
+    position:sticky;
+    top:0;
+    z-index:1000;
+    width:100%;              /* ocupa toda la ventana   */
+    background:#2c3e50;
+    color:#fff;
+    height:70px;
+}
+
+/* contenedor que SI coincide con los 1200 px */
+.header-inner{
+    max-width:1200px;
+    height:100%;
+    margin:0 auto;           /* lo centra */
+    padding:0 1.25rem;       /* mismo padding lateral   */
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+/* bloque izquierdo */
+.header-left{display:flex;align-items:center;gap:1rem;}
+.logo{font-size:1.5rem;font-weight:bold;line-height:1;}
+.brand{font-weight:bold;font-size:1.2rem;}
+
+/* menú usuario desktop */
+.user-nav ul{display:flex;list-style:none;gap:1rem;}
+.user-nav a{color:#fff;text-decoration:none;font-size:.95rem;}
+
+/* botón hamburguesa */
+.menu-btn{display:none;background:none;border:none;font-size:1.8rem;color:#fff;cursor:pointer;}
+
+/* -------------  ASIDE ------------- */
+aside{
+    width:250px;
+    background:#fff;
+    color:#000;
+    padding:1rem;
+    position:sticky;
+    top:70px;
+    height:calc(100vh - 70px);
+    overflow-y:auto;
+    z-index:100;
+}
+.nav ul{list-style:none;}
+.nav li{margin-bottom:.5rem;}
+.nav a{display:block;padding:.5rem;font-size:1.3rem;color:#000;text-decoration:none;border-radius:4px;transition:background .3s;}
+.nav a:hover{background:#2c3e50;color:#fff;}
+
+.user-nav-mobile{display:none;border-top:1px solid #eee;margin-top:1rem;padding-top:1rem;}
+.user-nav-mobile a{display:block;padding:.5rem;font-size:1.1rem;color:#000;text-decoration:none;}
+
+/* -------------  MAIN ------------- */
+main{
+    flex:1;
+    padding:1.5rem;
+    background:#ecf0f1;
+    overflow-y:auto;
+    min-height:calc(100vh - 70px);
+}
+h1{margin-bottom:1.5rem;color:#2c3e50;}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem;}
+.card,.logs{background:#fff;padding:1.5rem;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,.1);}
+.card h2{font-size:1rem;color:#7f8c8d;margin-bottom:.5rem;}
+.card p{font-size:1.8rem;font-weight:bold;color:#2c3e50;}
+
+/* -------------  CHAT ------------- */
+.chat-container{display:flex;flex-direction:column;height:500px;border:1px solid #ddd;border-radius:4px;overflow:hidden;}
+.chat-messages{flex:1;padding:1rem;overflow-y:auto;background:#f9f9f9;}
+.message{margin-bottom:1.5rem;padding:.75rem 1rem;border-radius:8px;font-size:1.2rem;line-height:1.4;}
+.message-user{background:#3498db;color:#fff;}
+.message-other{background:#e0e0e0;}
+.message-info{font-size:.75rem;margin-top:.25rem;opacity:.8;}
+.message-user .message-info{text-align:right;color:#e0e0e0;}
+.message-other .message-info{color:#666;}
+
+.chat-input{display:flex;border-top:1px solid #999;background:#fff;}
+.chat-input input{flex:1;padding:1rem;border:none;outline:none;}
+.chat-input button{padding:0 1.5rem;background:#3498db;color:#fff;border:none;cursor:pointer;transition:background .3s;}
+.chat-input button:hover{background:#2980b9;}
+
+/* -------------  RESPONSIVE ------------- */
+@media (max-width:768px){
+    .menu-btn{display:block;}
+    .user-nav{display:none;}
+    .user-nav-mobile{display:block;}
+
+    aside{
+        position:fixed;
+        top:0;
+        left:0;
+        transform:translateX(-100%);
+        transition:transform .3s ease;
+        padding-top:70px;
+        height:100vh;
+    }
+    aside.open{transform:translateX(0);}
+}
+
+@media (min-width:769px){
+    .menu-btn{display:none;}
+    .user-nav{display:block;}
+    .user-nav-mobile{display:none;}
+}
+
+</style>
