@@ -1,10 +1,53 @@
 <?php
-// login.php
+// login.php - Solo markup (la lógica está en index.php)
+if (isset($error)) echo "<div class='error'>$error</div>";
+
+// Incluir conexión a la base de datos
+require_once 'database.php';
+
+$error = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $username = $_POST['username'];
+  $password = $_POST['password'];
+
+  try {
+    // Crear la conexión a la base de datos
+    $nombreHost = 'localhost';
+    $baseDatos = 'consultorias';
+    $usuario = 'root';
+    $contrasena = "";
+
+    $conn = new PDO("mysql:host=$nombreHost;dbname=$baseDatos", $usuario, $contrasena);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // Consulta preparada para evitar SQL injection
+    $stmt = $conn->prepare("SELECT id, contrasena, rol FROM usuarios WHERE nombre_usuario = ? LIMIT 1");
+    $stmt->execute([$username]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($user && password_verify($password, $user['contrasena'])) {
+      // Credenciales válidas
+      $_SESSION['user_id'] = $user['id'];
+      $_SESSION['username'] = $username;
+      $_SESSION['rol'] = $user['rol'];
+      $_SESSION['last_activity'] = time();
+
+      header('Location: dashboard.php');
+      exit();
+    } else {
+      $error = "Usuario o contraseña incorrectos";
+    }
+  } catch (PDOException $e) {
+    $error = "Error al conectar con la base de datos: " . $e->getMessage();
+  }
+}
 ?>
 <!-- Wrapper para centrado -->
 <div class="login-wrapper">
   <div class="login-container">
     <h1>Acceso a clientes</h1>
+    <?php if (isset($error)) echo "<p>$error</p>"; ?>
     <form action="#" method="post">
       <input type="text" name="username" placeholder="Usuario o correo electrónico" required />
       <input type="password" name="password" placeholder="Contraseña" required />

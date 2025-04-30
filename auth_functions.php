@@ -1,7 +1,4 @@
 <?php
-// index.php - Punto de entrada único
-session_start();
-require_once 'database.php';
 
 // Función para verificar sesión
 function isLoggedIn()
@@ -26,14 +23,3 @@ function checkSessionExpiration()
     $_SESSION['last_activity'] = time();
     return true;
 }
-
-// Redirigir lógica
-if (isLoggedIn() && checkSessionExpiration()) {
-    header('Location: dashboard.php');
-    exit();
-}
-
-// Cargar vista
-include 'header.php';
-include (isLoggedIn() && checkSessionExpiration()) ? 'dashboard.php' : 'login.php';
-include 'footer.php';
