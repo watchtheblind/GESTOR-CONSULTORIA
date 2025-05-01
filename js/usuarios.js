@@ -34,26 +34,80 @@ $(document).ready(function() {
         $('#contrasena').attr('required', true);
     });
 
-    // Editar usuario
+
+
+    // En tu archivo usuarios.js
+
     $(document).on('click', '.editarUsuario', function() {
         var id = $(this).data('id');
         
-        $.get('includes/usuarios_actions.php', { action: 'get', usuario_id: id }, function(response) {
-            var usuario = JSON.parse(response);
-            
-            $('#usuario_id').val(usuario.id);
-            $('#nombre_usuario').val(usuario.nombre_usuario);
-            $('#correo_electronico').val(usuario.correo_electronico);
-            $('#rol').val(usuario.rol);
-            $('#numero_telefono').val(usuario.numero_telefono);
-            $('#descripcion').val(usuario.descripcion);
-            $('#esta_activo').val(usuario.esta_activo);
-            
-            $('#usuarioModalLabel').text('Editar Usuario');
-            $('#passwordField').hide();
-            $('#contrasena').removeAttr('required');
-            $('#usuarioModal').modal('show');
+        $.ajax({
+            url: 'usuarios_actions.php',
+            type: 'GET',
+            data: { 
+                action: 'get',
+                usuario_id: id 
+            },
+            success: function(response) {
+                try {
+                    var usuario = JSON.parse(response);
+                    
+                    $('#usuario_id').val(usuario.id);
+                    $('#nombre_usuario').val(usuario.nombre_usuario);
+                    $('#correo_electronico').val(usuario.correo_electronico);
+                    $('#rol').val(usuario.rol);
+                    $('#numero_telefono').val(usuario.numero_telefono);
+                    $('#descripcion').val(usuario.descripcion);
+                    $('#esta_activo').val(usuario.esta_activo ? "1" : "0");
+                    
+                    $('#usuarioModalLabel').text('Editar Usuario');
+                    $('#passwordField').hide();
+                    $('#contrasena').removeAttr('required');
+                    $('#usuarioModal').modal('show');
+                } catch (e) {
+                    console.error('Error parsing response:', e);
+                    alert('Error al cargar los datos del usuario');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', status, error);
+                alert('Error al comunicarse con el servidor');
+            }
         });
+    });
+
+    $(document).on('click', '.eliminarUsuario', function() {
+        if (confirm('¿Estás seguro de eliminar este usuario?')) {
+            var id = $(this).data('id');
+            
+            $.ajax({
+                url: 'usuarios_actions.php',
+                type: 'POST',
+                data: { 
+                    action: 'delete', 
+                    usuario_id: id 
+                },
+                success: function(response) {
+                    try {
+                        var res = JSON.parse(response);
+                        
+                        if (res.error) {
+                            alert(res.error);
+                        } else {
+                            $('#usuariosTable').DataTable().ajax.reload();
+                            alert('Usuario eliminado correctamente');
+                        }
+                    } catch (e) {
+                        console.error('Error parsing response:', e);
+                        alert('Error al procesar la respuesta');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', status, error);
+                    alert('Error al comunicarse con el servidor');
+                }
+            });
+        }
     });
 
     // Guardar usuario
@@ -63,40 +117,32 @@ $(document).ready(function() {
         var formData = $(this).serialize();
         var action = $('#usuario_id').val() ? 'update' : 'create';
         
-        $.post('includes/usuarios_actions.php', formData + '&action=' + action, function(response) {
-            var res = JSON.parse(response);
-            
-            if (res.error) {
-                alert(res.error);
-            } else {
-                $('#usuarioModal').modal('hide');
-                table.ajax.reload();
-                alert('Usuario guardado correctamente');
+        $.ajax({
+            url: 'usuarios_actions.php',
+            type: 'POST',
+            data: formData + '&action=' + action,
+            success: function(response) {
+                try {
+                    var res = JSON.parse(response);
+                    
+                    if (res.error) {
+                        alert(res.error);
+                    } else {
+                        $('#usuarioModal').modal('hide');
+                        $('#usuariosTable').DataTable().ajax.reload();
+                        alert('Usuario guardado correctamente');
+                    }
+                } catch (e) {
+                    console.error('Error parsing response:', e);
+                    alert('Error al procesar la respuesta del servidor');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', status, error);
+                alert('Error al comunicarse con el servidor');
             }
         });
     });
-
-    // Eliminar usuario
-    $(document).on('click', '.eliminarUsuario', function() {
-        if (confirm('¿Estás seguro de eliminar este usuario?')) {
-            var id = $(this).data('id');
-            
-            $.post('includes/usuarios_actions.php', { 
-                action: 'delete', 
-                usuario_id: id 
-            }, function(response) {
-                var res = JSON.parse(response);
-                
-                if (res.error) {
-                    alert(res.error);
-                } else {
-                    table.ajax.reload();
-                    alert('Usuario eliminado correctamente');
-                }
-            });
-        }
-    });
-
     // Recuperar contraseña
     $('#recuperarModal').on('show.bs.modal', function(e) {
         var button = $(e.relatedTarget);
@@ -114,7 +160,7 @@ $(document).ready(function() {
     $('#recuperarForm').submit(function(e) {
         e.preventDefault();
         
-        $.post('includes/usuarios_actions.php', {
+        $.post('usuarios_actions.php', {
             action: 'recover',
             usuario_id: $('#recuperar_id').val(),
             nueva_contrasena: $('#nueva_contrasena').val()
