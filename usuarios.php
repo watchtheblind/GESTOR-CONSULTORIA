@@ -115,6 +115,66 @@ $titulo = "Gestión de Usuarios";
     </div>
 </div>
 
+<!-- Modal para Editar Usuario -->
+<div class="modal fade" id="editarUsuarioModal" tabindex="-1" aria-labelledby="editarUsuarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editarUsuarioModalLabel">Editar Datos del Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editarUsuarioForm" autocomplete="off">
+                <div class="modal-body">
+                    <input type="hidden" id="usuario_id" name="usuario_id">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="nombre_usuario" class="form-label">Nombre de Usuario</label>
+                            <input type="text" class="form-control" id="nombre_usuario" name="nombre_usuario" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="correo_electronico" class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="correo_electronico" name="correo_electronico" required>
+                        </div>
+                        <div class="col-md-6" id="passwordField">
+                            <label for="contrasena" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="contrasena" name="contrasena">
+                            <small class="text-muted">Dejar en blanco para no cambiar</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="rol" class="form-label">Rol</label>
+                            <select class="form-select" id="rol" name="rol" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="Administrador">Administrador</option>
+                                <option value="Subadministrador">Subadministrador</option>
+                                <option value="Consultor Principal">Consultor Principal</option>
+                                <option value="Consultor Colaborador">Consultor Colaborador</option>
+                                <option value="Cliente">Cliente</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="numero_telefono" class="form-label">Teléfono</label>
+                            <input type="text" class="form-control" id="numero_telefono" name="numero_telefono">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="esta_activo" class="form-label">Estado</label>
+                            <select class="form-select" id="esta_activo" name="esta_activo">
+                                <option value="1">Activo</option>
+                                <option value="0">Inactivo</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <!-- Modal para Recuperar Contraseña -->
 <div class="modal fade" id="recuperarModal" tabindex="-1" aria-hidden="true">
@@ -122,7 +182,7 @@ $titulo = "Gestión de Usuarios";
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Recuperar Contraseña</h5>
-                <button type="button" class="btn-close" data-bs-close="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="recuperarForm">
                 <div class="modal-body">

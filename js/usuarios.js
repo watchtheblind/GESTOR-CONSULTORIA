@@ -40,32 +40,40 @@ $(document).ready(function() {
 
     $(document).on('click', '.editarUsuario', function() {
         var id = $(this).data('id');
-        
         $.ajax({
             url: 'usuarios_actions.php',
-            type: 'GET',
+            type: 'POST',
             data: { 
                 action: 'get',
                 usuario_id: id 
             },
             success: function(response) {
                 try {
-                    var usuario = JSON.parse(response);
+                    var usuario = response; // jQuery parsea automáticamente JSON si el header es correcto
+                    console.log(usuario); // Para depurar y verificar la respuesta
                     
-                    $('#usuario_id').val(usuario.id);
-                    $('#nombre_usuario').val(usuario.nombre_usuario);
-                    $('#correo_electronico').val(usuario.correo_electronico);
-                    $('#rol').val(usuario.rol);
-                    $('#numero_telefono').val(usuario.numero_telefono);
-                    $('#descripcion').val(usuario.descripcion);
-                    $('#esta_activo').val(usuario.esta_activo ? "1" : "0");
+                    // Asignar valores a los campos del modal
+                    $('#editarUsuarioForm #usuario_id').val(usuario.id);
+                    $('#editarUsuarioForm #nombre_usuario').val(usuario.nombre_usuario);
+                    $('#editarUsuarioForm #correo_electronico').val(usuario.correo_electronico);
+                    $('#editarUsuarioForm #rol').val(usuario.rol);
+                    $('#editarUsuarioForm #numero_telefono').val(usuario.numero_telefono);
+                    $('#editarUsuarioForm #descripcion').val(usuario.descripcion);
+                    $('#editarUsuarioForm #esta_activo').val(usuario.esta_activo ? "1" : "0");
                     
-                    $('#usuarioModalLabel').text('Editar Usuario');
-                    $('#passwordField').hide();
-                    $('#contrasena').removeAttr('required');
-                    $('#usuarioModal').modal('show');
+                    // Ocultar campo contraseña y no requerirlo
+                    $('#editarUsuarioForm #passwordField').hide();
+                    $('#editarUsuarioForm #contrasena').removeAttr('required');
+
+                    // Cambiar título del modal
+                    $('#editarUsuarioModalLabel').text('Editar Datos del Usuario');
+
+                    // Mostrar el modal (Bootstrap 5)
+                    var editarModal = new bootstrap.Modal(document.getElementById('editarUsuarioModal'));
+                    editarModal.show();
+                    
                 } catch (e) {
-                    console.error('Error parsing response:', e);
+                    console.error('Error procesando los datos del usuario:', e);
                     alert('Error al cargar los datos del usuario');
                 }
             },
@@ -76,6 +84,38 @@ $(document).ready(function() {
         });
     });
 
+    // Manejo del envío del formulario (modificar según tu lógica de guardado)
+    $('#editarUsuarioForm').submit(function(e) {
+        e.preventDefault();
+
+        var formData = $(this).serialize();
+        var action = 'update'; // Como es modal de editar, se asume update
+
+        $.ajax({
+            url: 'usuarios_actions.php',
+            type: 'POST',
+            data: formData + '&action=' + action,
+            success: function(response) {
+                try {
+                    if(response.error){
+                        alert(response.error);
+                    } else {
+                        alert('Usuario actualizado correctamente');
+                        $('#editarUsuarioModal').modal('hide');
+                        $('#usuariosTable').DataTable().ajax.reload();
+                    }
+                } catch(e) {
+                    console.error('Error procesando la respuesta:', e);
+                    alert('Error al procesar la respuesta del servidor');
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Error en la comunicación con el servidor');
+            }
+        });
+
+    });
+    
     $(document).on('click', '.eliminarUsuario', function() {
         if (confirm('¿Estás seguro de eliminar este usuario?')) {
             var id = $(this).data('id');
@@ -89,16 +129,15 @@ $(document).ready(function() {
                 },
                 success: function(response) {
                     try {
-                        var res = JSON.parse(response);
-                        
-                        if (res.error) {
-                            alert(res.error);
+                        // No uses JSON.parse si la respuesta ya es un objeto
+                        if (response.error) {
+                            alert(response.error);
                         } else {
                             $('#usuariosTable').DataTable().ajax.reload();
                             alert('Usuario eliminado correctamente');
                         }
                     } catch (e) {
-                        console.error('Error parsing response:', e);
+                        console.error('Error procesando la respuesta:', e);
                         alert('Error al procesar la respuesta');
                     }
                 },
@@ -109,7 +148,6 @@ $(document).ready(function() {
             });
         }
     });
-
     // Guardar usuario
     $('#usuarioForm').submit(function(e) {
         e.preventDefault();
@@ -123,17 +161,16 @@ $(document).ready(function() {
             data: formData + '&action=' + action,
             success: function(response) {
                 try {
-                    var res = JSON.parse(response);
-                    
-                    if (res.error) {
-                        alert(res.error);
+                    // response is expected as a JSON object parsed by jQuery automatically
+                    if (response.error) {
+                        alert(response.error);
                     } else {
                         $('#usuarioModal').modal('hide');
                         $('#usuariosTable').DataTable().ajax.reload();
                         alert('Usuario guardado correctamente');
                     }
                 } catch (e) {
-                    console.error('Error parsing response:', e);
+                    console.error('Error procesando la respuesta:', e);
                     alert('Error al procesar la respuesta del servidor');
                 }
             },
@@ -143,7 +180,21 @@ $(document).ready(function() {
             }
         });
     });
-    // Recuperar contraseña
+
+    $(document).on('click', '.recuperarContrasena', function() {
+        var id = $(this).data('id');
+        var nombre = $(this).data('nombre');
+
+        // Asignar datos si lo deseas
+        $('#recuperar_id').val(id);
+        $('#usuarioNombre').text(nombre);
+
+        // Mostrar el modal manualmente
+        var modal = new bootstrap.Modal(document.getElementById('recuperarModal'));
+        modal.show();
+    });
+
+   // Recuperar contraseña
     $('#recuperarModal').on('show.bs.modal', function(e) {
         var button = $(e.relatedTarget);
         var id = button.data('id');
@@ -157,9 +208,10 @@ $(document).ready(function() {
         $('#nueva_contrasena').val(newPassword);
     });
 
+    // Manejo del formulario de recuperación
     $('#recuperarForm').submit(function(e) {
-        e.preventDefault();
-        
+        e.preventDefault(); // Evita el comportamiento por defecto del formulario
+
         $.post('usuarios_actions.php', {
             action: 'recover',
             usuario_id: $('#recuperar_id').val(),
