@@ -9,45 +9,50 @@ if ($_SESSION['rol'] !== 'Administrador' && $_SESSION['rol'] !== 'Subadministrad
 }
 
 $titulo = "Gestión de Usuarios";
-include 'header.php';
 ?>
+<main>
+    <?php
+    include 'header.php'; ?>
+    <aside>
+        <?php
+        include 'sidebar.php'; ?>
+    </aside>
+    <div class="container-fluid px-4">
+        <h1 class="mt-4"><?= $titulo ?></h1>
 
-<aside>
-    <?php include 'sidebar.php'; ?>
-</aside>
-<div class="container-fluid px-4">
-    <h1 class="mt-4"><?= $titulo ?></h1>
-
-    <div class="card mb-4">
-        <div class="card-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <i class="fas fa-users me-1"></i>
-                    Listado de Usuarios
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-users me-1"></i>
+                        Listado de Usuarios
+                    </div>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#usuarioModal">
+                        <i class="fas fa-plus"></i> Nuevo Usuario
+                    </button>
                 </div>
-                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#usuarioModal">
-                    <i class="fas fa-plus"></i> Nuevo Usuario
-                </button>
+            </div>
+            <div class="card-body">
+                <table id="usuariosTable" class="table table-striped table-bordered" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre Usuario</th>
+                            <th>Correo Electrónico</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Creado En</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
-        <div class="card-body">
-            <table id="usuariosTable" class="table table-striped table-bordered" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre Usuario</th>
-                        <th>Correo Electrónico</th>
-                        <th>Rol</th>
-                        <th>Estado</th>
-                        <th>Creado En</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
     </div>
-</div>
+
+</main>
+
 
 <!-- Modal para Crear/Editar Usuario -->
 <div class="modal fade" id="usuarioModal" tabindex="-1" aria-labelledby="usuarioModalLabel" aria-hidden="true">
