@@ -148,20 +148,24 @@ try {
             }
             break;
         case 'recover':
-            $newPassword = bin2hex(random_bytes(4)); // Genera una contraseña aleatoria
-            $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+            // Asegúrate de que el usuario_id y nueva_contrasena estén definidos
+            if (isset($_POST['usuario_id']) && isset($_POST['nueva_contrasena'])) {
+                $hashedPassword = password_hash($_POST['nueva_contrasena'], PASSWORD_DEFAULT);
 
-            $stmt = $conn->prepare("UPDATE usuarios SET contrasena = ? WHERE id = ?");
-            $stmt->execute([$hashedPassword, $_POST['usuario_id']]);
+                $stmt = $conn->prepare("UPDATE usuarios SET contrasena = ? WHERE id = ?");
+                $stmt->execute([$hashedPassword, $_POST['usuario_id']]);
 
-            // Aquí deberías implementar el envío por correo
-            echo json_encode([
-                'success' => true,
-                'new_password' => $newPassword,
-                'message' => 'Contraseña generada: ' . $newPassword
-            ]);
+                // Aquí deberías implementar el envío por correo si es necesario
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Contraseña actualizada correctamente.'
+                ]);
+            } else {
+                echo json_encode([
+                    'error' => 'Datos incompletos.'
+                ]);
+            }
             break;
-
         default:
             throw new Exception("Acción no válida");
     }

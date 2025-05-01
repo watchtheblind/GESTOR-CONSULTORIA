@@ -190,12 +190,12 @@ $titulo = "Gestión de Usuarios";
                     <p>¿Deseas generar una nueva contraseña para <span id="usuarioNombre"></span>?</p>
                     <div class="mb-3">
                         <label for="nueva_contrasena" class="form-label">Nueva Contraseña</label>
-                        <input type="text" class="form-control" id="nueva_contrasena" name="nueva_contrasena" readonly>
+                        <input type="text" class="form-control" id="nueva_contrasena" name="nueva_contrasena">
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Enviar al correo</button>
+                    <button type="submit" class="btn btn-primary">Guardar contraseña</button>
                 </div>
             </form>
         </div>

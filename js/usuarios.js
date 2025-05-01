@@ -217,13 +217,11 @@ $(document).ready(function() {
             usuario_id: $('#recuperar_id').val(),
             nueva_contrasena: $('#nueva_contrasena').val()
         }, function(response) {
-            var res = JSON.parse(response);
-            
-            if (res.error) {
-                alert(res.error);
+            if (response.error) {
+                alert(response.error);
             } else {
                 $('#recuperarModal').modal('hide');
-                alert(res.message);
+                alert(response.message);
             }
         });
     });
