@@ -27,7 +27,7 @@
                 </a>
             </div>
             <span class="menu-toggle" id="menuToggle">☰</span>
-            <nav>
+            <nav class="top-actions">
                 <ul>
                     <li><a href="#">Inicio</a></li>
                     <li><a href="#">Características</a></li>

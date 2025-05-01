@@ -43,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 }
 ?>
+
 <!-- Wrapper para centrado -->
 <div class="login-wrapper">
   <div class="login-container">

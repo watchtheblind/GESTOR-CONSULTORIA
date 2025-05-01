@@ -27,13 +27,14 @@ function checkSessionExpiration()
     return true;
 }
 
-// Redirigir lógica
+// Redirigir lógica y carga de vista
 if (isLoggedIn() && checkSessionExpiration()) {
-    header('Location: dashboard.php');
-    exit();
+    // Usuario autenticado, mostrar dashboard con header y footer
+    include 'header.php';
+    include 'dashboard.php';
+    include 'footer.php';
+} else {
+    // Usuario no autenticado o sesión expirada, mostrar solo login
+    include 'header2.php';
+    include 'login.php';
 }
-
-// Cargar vista
-include 'header.php';
-include (isLoggedIn() && checkSessionExpiration()) ? 'dashboard.php' : 'login.php';
-include 'footer.php';
