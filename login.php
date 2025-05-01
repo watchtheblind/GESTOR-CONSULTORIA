@@ -8,7 +8,7 @@ require_once 'database.php';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $username = $_POST['username'];
+  $usernameOrEmail = $_POST['username']; // Cambiamos el nombre de la variable
   $password = $_POST['password'];
 
   try {
@@ -22,14 +22,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Consulta preparada para evitar SQL injection
-    $stmt = $conn->prepare("SELECT id, contrasena, rol FROM usuarios WHERE nombre_usuario = ? LIMIT 1");
-    $stmt->execute([$username]);
+    $stmt = $conn->prepare("SELECT id, contrasena, rol FROM usuarios WHERE nombre_usuario = ? OR correo_electronico = ? LIMIT 1");
+    $stmt->execute([$usernameOrEmail, $usernameOrEmail]); // Ejecutamos con el mismo valor
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user && password_verify($password, $user['contrasena'])) {
       // Credenciales válidas
       $_SESSION['user_id'] = $user['id'];
-      $_SESSION['username'] = $username;
+      $_SESSION['username'] = $usernameOrEmail; // Cambiamos a la nueva variable
       $_SESSION['rol'] = $user['rol'];
       $_SESSION['last_activity'] = time();
 
@@ -61,5 +61,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <a href="#">Si no eres cliente, adquiere nuestros servicios aquí</a>
     </div>
   </div>
-</div>
 </div>

@@ -29,7 +29,7 @@
       <span class="menu-toggle" id="menuToggle">☰</span>
       <div class="top-actions">
         <a href="#perfil">Mi perfil</a>
-        <a href="#logout">Cerrar cesión</a>
+        <a href="logout.php">Cerrar cesión</a>
       </div>
     </header>
     <div class="layout">
