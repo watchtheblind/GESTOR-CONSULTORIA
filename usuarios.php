@@ -11,11 +11,9 @@ if ($_SESSION['rol'] !== 'Administrador' && $_SESSION['rol'] !== 'Subadministrad
 $titulo = "Gestión de Usuarios";
 ?>
 <main>
-    <?php
-    include 'header.php'; ?>
+    <?php include 'header.php'; ?>
     <aside>
-        <?php
-        include 'sidebar.php'; ?>
+        <?php include 'sidebar.php'; ?>
     </aside>
     <div class="container-fluid px-4">
         <h1 class="mt-4"><?= $titulo ?></h1>
@@ -94,7 +92,6 @@ $titulo = "Gestión de Usuarios";
             </div>
         </div>
     </div>
-
 </main>
 
 
@@ -246,8 +243,144 @@ $titulo = "Gestión de Usuarios";
     </div>
 </div>
 
-<?php include 'footer.php'; ?>
 
+<!-- Modal para Asignar Cliente -->
+<div class="modal fade" id="asignarClienteModal" tabindex="-1" aria-labelledby="asignarClienteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="asignarClienteModalLabel">Asignar Cliente a Consultor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="asignarClienteForm">
+                <div class="modal-body">
+                    <input type="hidden" id="consultorId" name="consultor_id">
+                    <div class="mb-3">
+                        <label for="selectClientesDisponibles" class="form-label">Clientes Disponibles</label>
+                        <select id="selectClientesDisponibles" class="form-select" name="cliente_id" required>
+                            <option value="">Seleccione un cliente</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Asignar Cliente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Gestionar Colaboradores -->
+<div class="modal fade" id="colaboradoresModal" tabindex="-1" aria-labelledby="colaboradoresModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="colaboradoresModalLabel">Gestionar Colaboradores</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="colaboradoresForm">
+                <div class="modal-body">
+                    <input type="hidden" id="consultorPrincipalId" name="consultor_principal_id">
+                    <div class="mb-3">
+                        <label for="selectConsultoresColaboradores" class="form-label">Consultores Disponibles</label>
+                        <select id="selectConsultoresColaboradores" class="form-select" name="consultor_colaborador_id">
+                            <option value="">Seleccione un consultor colaborador</option>
+                        </select>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="accion_colaborador" id="agregarColaborador" value="agregar" checked>
+                        <label class="form-check-label" for="agregarColaborador">
+                            Agregar como colaborador
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="accion_colaborador" id="eliminarColaborador" value="eliminar">
+                        <label class="form-check-label" for="eliminarColaborador">
+                            Eliminar como colaborador
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Enviar Mensaje -->
+<div class="modal fade" id="mensajeModal" tabindex="-1" aria-labelledby="mensajeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mensajeModalLabel">Enviar Mensaje al Consultor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="mensajeForm">
+                <div class="modal-body">
+                    <input type="hidden" id="mensajeConsultorId" name="consultor_id">
+                    <div class="mb-3">
+                        <label for="asuntoMensaje" class="form-label">Asunto</label>
+                        <input type="text" class="form-control" id="asuntoMensaje" name="asunto" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="contenidoMensaje" class="form-label">Mensaje</label>
+                        <textarea class="form-control" id="contenidoMensaje" name="contenido" rows="5" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Enviar Mensaje</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Asignar Tarea -->
+<div class="modal fade" id="tareaModal" tabindex="-1" aria-labelledby="tareaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tareaModalLabel">Asignar Tarea al Consultor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="tareaForm">
+                <div class="modal-body">
+                    <input type="hidden" id="tareaConsultorId" name="consultor_id">
+                    <div class="mb-3">
+                        <label for="tituloTarea" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="tituloTarea" name="titulo" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descripcionTarea" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="descripcionTarea" name="descripcion" rows="5" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fechaVencimiento" class="form-label">Fecha de Vencimiento</label>
+                        <input type="date" class="form-control" id="fechaVencimiento" name="fecha_vencimiento" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="prioridadTarea" class="form-label">Prioridad</label>
+                        <select class="form-select" id="prioridadTarea" name="prioridad" required>
+                            <option value="baja">Baja</option>
+                            <option value="media" selected>Media</option>
+                            <option value="alta">Alta</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Asignar Tarea</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<?php include 'footer.php'; ?>
 <!-- Incluir Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
