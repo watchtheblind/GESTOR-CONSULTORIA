@@ -32,6 +32,42 @@ try {
             break;
 
         case 'create':
+            if (empty($_POST['contrasena'])) {
+                throw new Exception("La contraseña es requerida para nuevos usuarios");
+            }
+
+            $data = [
+                'nombre_usuario' => trim($_POST['nombre_usuario']),
+                'correo_electronico' => trim($_POST['correo_electronico']),
+                'rol' => $_POST['rol'],
+                'numero_telefono' => $_POST['numero_telefono'] ?? null,
+                'descripcion' => $_POST['descripcion'] ?? null,
+                'esta_activo' => $_POST['esta_activo'] ?? 1
+            ];
+
+            $data['contrasena'] = password_hash($_POST['contrasena'], PASSWORD_DEFAULT);
+
+            $sql = "INSERT INTO usuarios (nombre_usuario, contrasena, correo_electronico, rol, numero_telefono, descripcion, esta_activo) 
+                    VALUES (:nombre_usuario, :contrasena, :correo_electronico, :rol, :numero_telefono, :descripcion, :esta_activo)";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->execute($data);
+
+            // Si el rol es Cliente, crear registro en tabla clientes
+            if ($_POST['rol'] === 'Cliente') {
+                $usuario_id = $conn->lastInsertId();
+                $cliente_sql = "INSERT INTO clientes (nombre, correo_contacto) 
+                              VALUES (?, ?)";
+                $cliente_stmt = $conn->prepare($cliente_sql);
+                $cliente_stmt->execute([
+                    $data['nombre_usuario'],
+                    $data['correo_electronico']
+                ]);
+            }
+
+            echo json_encode(['success' => true]);
+            break;
+
         case 'update':
             // Validar datos
             $required = ['nombre_usuario', 'correo_electronico', 'rol'];
@@ -50,83 +86,47 @@ try {
                 'esta_activo' => $_POST['esta_activo'] ?? 1
             ];
 
-            if ($action === 'create') {
-                if (empty($_POST['contrasena'])) {
-                    throw new Exception("La contraseña es requerida para nuevos usuarios");
-                }
+            if (!empty($_POST['contrasena'])) {
                 $data['contrasena'] = password_hash($_POST['contrasena'], PASSWORD_DEFAULT);
-
-                $sql = "INSERT INTO usuarios (nombre_usuario, contrasena, correo_electronico, rol, numero_telefono, descripcion, esta_activo) 
-                        VALUES (:nombre_usuario, :contrasena, :correo_electronico, :rol, :numero_telefono, :descripcion, :esta_activo)";
-            } else {
-                $sql = "UPDATE usuarios SET 
-                        nombre_usuario = :nombre_usuario,
-                        correo_electronico = :correo_electronico,
-                        rol = :rol,
-                        numero_telefono = :numero_telefono,
-                        descripcion = :descripcion,
-                        esta_activo = :esta_activo";
-
-                if (!empty($_POST['contrasena'])) {
-                    $data['contrasena'] = password_hash($_POST['contrasena'], PASSWORD_DEFAULT);
-                    $sql .= ", contrasena = :contrasena";
-                }
-
-                $sql .= " WHERE id = :id";
-                $data['id'] = $_POST['usuario_id'];
             }
+
+            $sql = "UPDATE usuarios SET 
+                    nombre_usuario = :nombre_usuario,
+                    correo_electronico = :correo_electronico,
+                    rol = :rol,
+                    numero_telefono = :numero_telefono,
+                    descripcion = :descripcion,
+                    esta_activo = :esta_activo";
+
+            if (!empty($_POST['contrasena'])) {
+                $sql .= ", contrasena = :contrasena";
+            }
+
+            $sql .= " WHERE id = :id";
+            $data['id'] = $_POST['usuario_id'];
 
             $stmt = $conn->prepare($sql);
             $stmt->execute($data);
 
-            echo json_encode(['success' => true]);
-            break;
+            // Si el rol es Cliente, verificar si existe en tabla clientes
+            if ($_POST['rol'] === 'Cliente') {
+                // Verificar si ya existe en tabla clientes
+                $check_cliente = "SELECT id FROM clientes WHERE correo_contacto = ?";
+                $check_stmt = $conn->prepare($check_cliente);
+                $check_stmt->execute([$data['correo_electronico']]);
+                $cliente_existente = $check_stmt->fetch(PDO::FETCH_ASSOC);
 
-            // Validar datos
-            $required = ['nombre_usuario', 'correo_electronico', 'rol'];
-            foreach ($required as $field) {
-                if (empty($_POST[$field])) {
-                    throw new Exception("El campo $field es requerido");
+                if (!$cliente_existente) {
+                    // Si no existe, crear registro en tabla clientes
+                    $cliente_sql = "INSERT INTO clientes (nombre, correo_contacto) 
+                                  VALUES (?, ?)";
+                    $cliente_stmt = $conn->prepare($cliente_sql);
+                    $cliente_stmt->execute([
+                        $data['nombre_usuario'],
+                        $data['correo_electronico']
+                    ]);
                 }
             }
-
-            $data = [
-                'nombre_usuario' => trim($_POST['nombre_usuario']),
-                'correo_electronico' => trim($_POST['correo_electronico']),
-                'rol' => $_POST['rol'],
-                'numero_telefono' => $_POST['numero_telefono'] ?? null,
-                'descripcion' => $_POST['descripcion'] ?? null,
-                'esta_activo' => $_POST['esta_activo'] ?? 1
-            ];
-
-            if ($action === 'create') {
-                if (empty($_POST['contrasena'])) {
-                    throw new Exception("La contraseña es requerida para nuevos usuarios");
-                }
-                $data['contrasena'] = password_hash($_POST['contrasena'], PASSWORD_DEFAULT);
-
-                $sql = "INSERT INTO usuarios (nombre_usuario, contrasena, correo_electronico, rol, numero_telefono, descripcion, esta_activo) 
-                        VALUES (:nombre_usuario, :contrasena, :correo_electronico, :rol, :numero_telefono, :descripcion, :esta_activo)";
-            } else {
-                $sql = "UPDATE usuarios SET 
-                        nombre_usuario = :nombre_usuario,
-                        correo_electronico = :correo_electronico,
-                        rol = :rol,
-                        numero_telefono = :numero_telefono,
-                        descripcion = :descripcion,
-                        esta_activo = :esta_activo";
-
-                if (!empty($_POST['contrasena'])) {
-                    $data['contrasena'] = password_hash($_POST['contrasena'], PASSWORD_DEFAULT);
-                    $sql .= ", contrasena = :contrasena";
-                }
-
-                $sql .= " WHERE id = :id";
-                $data['id'] = $_POST['usuario_id'];
-            }
-
-            $stmt = $conn->prepare($sql);
-            $stmt->execute($data);
 
             echo json_encode(['success' => true]);
             break;

@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once 'auth_functions.php';
-
+require_once 'database.php';
 // Verificar permisos (solo admin y subadmin)
 if ($_SESSION['rol'] !== 'Administrador' && $_SESSION['rol'] !== 'Subadministrador') {
     header('Location: index.php');
@@ -272,13 +272,36 @@ $titulo = "Gestión de Usuarios";
                 <h5 class="modal-title" id="asignarClienteModalLabel">Asignar Cliente a Consultor</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="asignarClienteForm">
+            <form action="asignar_cliente.php" method="POST">
                 <div class="modal-body">
                     <input type="hidden" id="consultorId" name="consultor_id">
                     <div class="mb-3">
                         <label for="selectClientesDisponibles" class="form-label">Clientes Disponibles</label>
                         <select id="selectClientesDisponibles" class="form-select" name="cliente_id" required>
-                            <option value="">Seleccione un cliente</option>
+                            <?php
+                            // Obtener el ID del consultor si está en la URL
+                            $consultor_id = isset($_GET['consultor_id']) ? $_GET['consultor_id'] : null;
+
+                            // Consulta para obtener los clientes disponibles
+                            $query = "SELECT c.id, c.nombre, c.correo_contacto
+                                     FROM clientes c
+                                     LEFT JOIN cliente_consultor cc ON c.id = cc.cliente_id AND cc.consultor_id = ?
+                                     WHERE cc.id IS NULL";
+
+                            $stmt = $conn->prepare($query);
+                            $stmt->execute([$consultor_id]);
+                            $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                            echo '<option value="">Seleccione un cliente</option>';
+                            foreach ($clientes as $cliente) {
+                                printf(
+                                    '<option value="%d">%s - %s</option>',
+                                    $cliente['id'],
+                                    htmlspecialchars($cliente['nombre']),
+                                    htmlspecialchars($cliente['correo_contacto'])
+                                );
+                            }
+                            ?>
                         </select>
                     </div>
                 </div>
@@ -401,23 +424,3 @@ $titulo = "Gestión de Usuarios";
 </div>
 
 <?php include 'footer.php'; ?>
-<!-- Incluir Bootstrap CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<!-- Incluir Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-
-<!-- Incluir DataTables con Bootstrap 5 -->
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.13.4/b-2.3.6/b-html5-2.3.6/datatables.min.css" />
-
-<!-- Incluir jQuery y Bootstrap JS Bundle con Popper -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Incluir DataTables y extensiones -->
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.13.4/b-2.3.6/b-html5-2.3.6/datatables.min.js"></script>
-
-<!-- Incluir nuestro script personalizado -->
-<script src="js/usuarios.js"></script>
