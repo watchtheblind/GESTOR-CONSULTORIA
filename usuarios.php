@@ -74,9 +74,29 @@ $titulo = "Gestión de Usuarios";
             <!-- Pestaña de Consultores -->
             <div class="tab-pane fade" id="consultores" role="tabpanel" aria-labelledby="consultores-tab">
                 <div class="card mb-4">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-user-tie me-1"></i>
+                                Listado de Consultores
+                            </div>
+                        </div>
+                    </div>
                     <div class="card-body">
-                        <h5 class="card-title">Gestión de Consultores</h5>
-                        <p class="card-text">Contenido pendiente para la gestión de consultores.</p>
+                        <table id="consultoresTable" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre Consultor</th>
+                                    <th>Correo Electrónico</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                    <th>Creado En</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
                 </div>
             </div>

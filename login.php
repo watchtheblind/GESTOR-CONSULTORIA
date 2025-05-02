@@ -12,15 +12,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $password = $_POST['password'];
 
   try {
-    // Crear la conexión a la base de datos
-    $nombreHost = 'localhost';
-    $baseDatos = 'consultorias';
-    $usuario = 'root';
-    $contrasena = "";
-
-    $conn = new PDO("mysql:host=$nombreHost;dbname=$baseDatos", $usuario, $contrasena);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
     // Consulta preparada para evitar SQL injection
     $stmt = $conn->prepare("SELECT id, contrasena, rol FROM usuarios WHERE nombre_usuario = ? OR correo_electronico = ? LIMIT 1");
     $stmt->execute([$usernameOrEmail, $usernameOrEmail]); // Ejecutamos con el mismo valor

@@ -25,6 +25,32 @@ $(document).ready(function() {
         }
     });
 
+    // Inicializar DataTable de Consultores
+    var consultoresTable = $('#consultoresTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: 'consultores_datatables.php',
+            type: 'POST'
+        },
+        columns: [
+            { data: 0 },
+            { data: 1 },
+            { data: 2 },
+            { data: 3 },
+            { data: 4 },
+            { data: 5 },
+            { 
+                data: 6,
+                orderable: false,
+                searchable: false
+            }
+        ],
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json'
+        }
+    });
+
     // Mostrar modal para nuevo usuario
     $('#usuarioModal').on('show.bs.modal', function() {
         $('#usuarioForm')[0].reset();
@@ -33,8 +59,6 @@ $(document).ready(function() {
         $('#passwordField').show();
         $('#contrasena').attr('required', true);
     });
-
-
 
     // En tu archivo usuarios.js
 
@@ -224,5 +248,36 @@ $(document).ready(function() {
                 alert(response.message);
             }
         });
+    });
+
+    // Manejadores de eventos para los botones de consultores
+    $(document).on('click', '.asignarCliente', function() {
+        var id = $(this).data('id');
+        $('#consultorId').val(id);
+        $('#asignarClienteModal').modal('show');
+    });
+
+    $(document).on('click', '.retirarCliente', function() {
+        var id = $(this).data('id');
+        // Aquí iría la lógica para retirar cliente
+        alert('Función de retirar cliente pendiente');
+    });
+
+    $(document).on('click', '.enviarMensaje', function() {
+        var id = $(this).data('id');
+        $('#mensajeConsultorId').val(id);
+        $('#mensajeModal').modal('show');
+    });
+
+    $(document).on('click', '.asignarTarea', function() {
+        var id = $(this).data('id');
+        $('#tareaConsultorId').val(id);
+        $('#tareaModal').modal('show');
+    });
+
+    $(document).on('click', '.gestionarColaborador', function() {
+        var id = $(this).data('id');
+        $('#consultorPrincipalId').val(id);
+        $('#colaboradoresModal').modal('show');
     });
 });
