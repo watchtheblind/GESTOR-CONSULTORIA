@@ -20,33 +20,77 @@ $titulo = "Gestión de Usuarios";
     <div class="container-fluid px-4">
         <h1 class="mt-4"><?= $titulo ?></h1>
 
-        <div class="card mb-4">
-            <div class="card-header">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <i class="fas fa-users me-1"></i>
-                        Listado de Usuarios
+        <!-- Pestañas de Bootstrap -->
+        <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="usuarios-tab" data-bs-toggle="tab" data-bs-target="#usuarios" type="button" role="tab" aria-controls="usuarios" aria-selected="true">
+                    <i class="fas fa-users me-1"></i> Usuarios
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="consultores-tab" data-bs-toggle="tab" data-bs-target="#consultores" type="button" role="tab" aria-controls="consultores" aria-selected="false">
+                    <i class="fas fa-user-tie me-1"></i> Consultores
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="otros-tab" data-bs-toggle="tab" data-bs-target="#otros" type="button" role="tab" aria-controls="otros" aria-selected="false">
+                    <i class="fas fa-ellipsis-h me-1"></i> Otros
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <!-- Pestaña de Usuarios -->
+            <div class="tab-pane fade show active" id="usuarios" role="tabpanel" aria-labelledby="usuarios-tab">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-users me-1"></i>
+                                Listado de Usuarios
+                            </div>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#usuarioModal">
+                                <i class="fas fa-plus"></i> Nuevo Usuario
+                            </button>
+                        </div>
                     </div>
-                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#usuarioModal">
-                        <i class="fas fa-plus"></i> Nuevo Usuario
-                    </button>
+                    <div class="card-body">
+                        <table id="usuariosTable" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre Usuario</th>
+                                    <th>Correo Electrónico</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                    <th>Creado En</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-            <div class="card-body">
-                <table id="usuariosTable" class="table table-striped table-bordered" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre Usuario</th>
-                            <th>Correo Electrónico</th>
-                            <th>Rol</th>
-                            <th>Estado</th>
-                            <th>Creado En</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+
+            <!-- Pestaña de Consultores -->
+            <div class="tab-pane fade" id="consultores" role="tabpanel" aria-labelledby="consultores-tab">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Gestión de Consultores</h5>
+                        <p class="card-text">Contenido pendiente para la gestión de consultores.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pestaña de Otros -->
+            <div class="tab-pane fade" id="otros" role="tabpanel" aria-labelledby="otros-tab">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Otras Funcionalidades</h5>
+                        <p class="card-text">Contenido pendiente para otras funcionalidades.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
