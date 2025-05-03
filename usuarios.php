@@ -539,4 +539,29 @@ $titulo = "Gestión de Usuarios";
     </div>
 </div>
 
+<!-- Modal para Opciones de Mensajes -->
+<div class="modal fade" id="mensajesClienteModal" tabindex="-1" aria-labelledby="mensajesClienteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mensajesClienteModalLabel">Opciones de Mensajes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-primary" id="irAlChat">
+                        <i class="bi bi-chat-dots me-2"></i>Ir al Chat
+                    </button>
+                    <button type="button" class="btn btn-danger" id="eliminarChat">
+                        <i class="bi bi-trash me-2"></i>Eliminar Chat
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?php include 'footer.php'; ?>

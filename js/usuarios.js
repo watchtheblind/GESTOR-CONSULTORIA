@@ -340,8 +340,31 @@ $(document).ready(function() {
     // Manejadores de eventos para los botones de clientes
     $(document).on('click', '.mensajeCliente', function() {
         var id = $(this).data('id');
-        // Aquí se implementará la lógica para mensajes
-        alert('Funcionalidad de mensajes pendiente para el cliente ID: ' + id);
+        var nombre = $(this).closest('tr').find('td:eq(1)').text(); // Obtener el nombre del cliente
+        
+        // Guardar el ID del cliente en el modal
+        $('#mensajesClienteModal').data('cliente-id', id);
+        $('#mensajesClienteModalLabel').text('Opciones de Mensajes - ' + nombre);
+        
+        // Mostrar el modal
+        var modal = new bootstrap.Modal(document.getElementById('mensajesClienteModal'));
+        modal.show();
+    });
+
+    // Manejador para el botón "Ir al Chat"
+    $('#irAlChat').click(function() {
+        var clienteId = $('#mensajesClienteModal').data('cliente-id');
+        // Aquí se implementará la redirección al chat
+        alert('Redirigiendo al chat del cliente ID: ' + clienteId);
+    });
+
+    // Manejador para el botón "Eliminar Chat"
+    $('#eliminarChat').click(function() {
+        var clienteId = $('#mensajesClienteModal').data('cliente-id');
+        if (confirm('¿Estás seguro de eliminar el chat con este cliente?')) {
+            // Aquí se implementará la eliminación del chat
+            alert('Chat eliminado para el cliente ID: ' + clienteId);
+        }
     });
 
     $(document).on('click', '.archivosCliente', function() {
