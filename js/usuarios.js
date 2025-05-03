@@ -402,6 +402,11 @@ $(document).ready(function() {
         $('#proyectoClienteId').val(id);
         $('#proyectosClienteModalLabel').text('Gestionar Proyectos - ' + nombre);
         
+        // Cargar proyectos existentes
+        $.get('cargar_proyectos.php', { cliente_id: id }, function(data) {
+            $('#proyectosTableBody').html(data);
+        });
+        
         // Mostrar el modal
         var modal = new bootstrap.Modal(document.getElementById('proyectosClienteModal'));
         modal.show();

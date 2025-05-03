@@ -566,14 +566,33 @@ $titulo = "Gestión de Usuarios";
 
 <!-- Modal para Proyectos -->
 <div class="modal fade" id="proyectosClienteModal" tabindex="-1" aria-labelledby="proyectosClienteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="proyectosClienteModalLabel">Gestionar Proyectos</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="gestionar_proyecto.php" method="POST">
-                <div class="modal-body">
+            <div class="modal-body">
+                <!-- Tabla de Proyectos Existentes -->
+                <div class="table-responsive mb-4">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="proyectosTableBody">
+                            <!-- Los proyectos se cargarán aquí -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Formulario para Nuevo Proyecto -->
+                <h6>Crear Nuevo Proyecto</h6>
+                <form action="gestionar_proyecto.php" method="POST">
                     <input type="hidden" name="cliente_id" id="proyectoClienteId">
                     <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre del Proyecto</label>
@@ -590,12 +609,12 @@ $titulo = "Gestión de Usuarios";
                             <option value="Cerrado">Cerrado</option>
                         </select>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar Proyecto</button>
-                </div>
-            </form>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Proyecto</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
