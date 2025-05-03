@@ -326,13 +326,34 @@ $titulo = "Gestión de Usuarios";
                 <h5 class="modal-title" id="colaboradoresModalLabel">Gestionar Colaboradores</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="colaboradoresForm">
+            <form id="colaboradoresForm" action="gestionar_colaborador.php" method="POST">
                 <div class="modal-body">
                     <input type="hidden" id="consultorPrincipalId" name="consultor_principal_id">
                     <div class="mb-3">
                         <label for="selectConsultoresColaboradores" class="form-label">Consultores Disponibles</label>
                         <select id="selectConsultoresColaboradores" class="form-select" name="consultor_colaborador_id">
                             <option value="">Seleccione un consultor colaborador</option>
+                            <?php
+                            // Consulta para obtener consultores disponibles
+                            $query = "SELECT id, nombre_usuario, rol 
+                                    FROM usuarios 
+                                    WHERE rol IN ('Consultor Principal', 'Consultor Colaborador')
+                                    AND esta_activo = 1 
+                                    ORDER BY nombre_usuario";
+
+                            $stmt = $conn->prepare($query);
+                            $stmt->execute();
+                            $consultores = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                            foreach ($consultores as $consultor) {
+                                printf(
+                                    '<option value="%d">%s (%s)</option>',
+                                    $consultor['id'],
+                                    htmlspecialchars($consultor['nombre_usuario']),
+                                    htmlspecialchars($consultor['rol'])
+                                );
+                            }
+                            ?>
                         </select>
                     </div>
                     <div class="form-check">
