@@ -401,7 +401,6 @@ $(document).ready(function() {
     $(document).on('click', '.archivosCliente', function() {
         var id = $(this).data('id');
         // Aquí se implementará la lógica para archivos
-        alert('Funcionalidad de archivos pendiente para el cliente ID: ' + id);
     });
 
     $(document).on('click', '.proyectosCliente', function() {

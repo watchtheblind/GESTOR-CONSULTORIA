@@ -60,9 +60,17 @@ try {
             $stmt = $conn->prepare($sql);
             $stmt->execute($data);
 
+            // Obtener el ID del usuario creado
+            $usuario_id = $conn->lastInsertId();
+
+            // Crear carpeta para el usuario
+            $directorio_usuario = "uploads/usuarios/$usuario_id";
+            if (!file_exists($directorio_usuario)) {
+                mkdir($directorio_usuario, 0777, true);
+            }
+
             // Si el rol es Cliente, crear registro en tabla clientes
             if ($_POST['rol'] === 'Cliente') {
-                $usuario_id = $conn->lastInsertId();
                 $cliente_sql = "INSERT INTO clientes (nombre, correo_contacto) 
                               VALUES (?, ?)";
                 $cliente_stmt = $conn->prepare($cliente_sql);
@@ -147,29 +155,45 @@ try {
 
         case 'delete':
             if ($_SESSION['rol'] !== 'Administrador') {
-                http_response_code(403); // Proporciona un código de estado 403 para acceso no autorizado
+                http_response_code(403);
                 echo json_encode(['error' => "Solo el administrador puede eliminar usuarios"]);
                 exit();
             }
 
             try {
+                $usuario_id = $_POST['usuario_id'];
+
+                // Eliminar carpeta del usuario
+                $directorio_usuario = "uploads/usuarios/$usuario_id";
+                if (file_exists($directorio_usuario)) {
+                    // Eliminar todos los archivos y subdirectorios
+                    $files = glob($directorio_usuario . '/*');
+                    foreach ($files as $file) {
+                        if (is_file($file)) {
+                            unlink($file);
+                        }
+                    }
+                    rmdir($directorio_usuario);
+                }
+
+                // Eliminar usuario de la base de datos
                 $stmt = $conn->prepare("DELETE FROM usuarios WHERE id = ?");
-                $stmt->execute([$_POST['usuario_id']]);
+                $stmt->execute([$usuario_id]);
+
                 echo json_encode(['success' => true]);
             } catch (Exception $e) {
-                http_response_code(500); // Proporciona un código de estado 500 para errores del servidor
+                http_response_code(500);
                 echo json_encode(['error' => 'Error al eliminar el usuario: ' . $e->getMessage()]);
             }
             break;
+
         case 'recover':
-            // Asegúrate de que el usuario_id y nueva_contrasena estén definidos
             if (isset($_POST['usuario_id']) && isset($_POST['nueva_contrasena'])) {
                 $hashedPassword = password_hash($_POST['nueva_contrasena'], PASSWORD_DEFAULT);
 
                 $stmt = $conn->prepare("UPDATE usuarios SET contrasena = ? WHERE id = ?");
                 $stmt->execute([$hashedPassword, $_POST['usuario_id']]);
 
-                // Aquí deberías implementar el envío por correo si es necesario
                 echo json_encode([
                     'success' => true,
                     'message' => 'Contraseña actualizada correctamente.'
@@ -180,6 +204,7 @@ try {
                 ]);
             }
             break;
+
         default:
             throw new Exception("Acción no válida");
     }

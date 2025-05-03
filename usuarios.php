@@ -680,4 +680,183 @@ $titulo = "Gestión de Usuarios";
     </div>
 </div>
 
+<!-- Modal para Archivos de Cliente -->
+<div class="modal fade" id="archivosClienteModal" tabindex="-1" aria-labelledby="archivosClienteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="archivosClienteModalLabel">Archivos del Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="subirArchivoForm" enctype="multipart/form-data">
+                    <input type="hidden" id="archivoClienteId" name="usuario_id">
+                    <div class="mb-3">
+                        <label for="proyecto_id" class="form-label">Proyecto (opcional)</label>
+                        <select class="form-select" id="proyecto_id" name="proyecto_id">
+                            <option value="">Seleccione un proyecto</option>
+                            <?php
+                            $stmt = $conn->query("SELECT id, nombre FROM proyectos WHERE estado = 'Activo'");
+                            while ($proyecto = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                echo "<option value='{$proyecto['id']}'>{$proyecto['nombre']}</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="archivo" class="form-label">Archivo</label>
+                        <input type="file" class="form-control" id="archivo" name="archivo" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Subir Archivo</button>
+                </form>
+                <hr>
+                <div class="table-responsive">
+                    <table class="table table-striped" id="archivosTable">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Proyecto</th>
+                                <th>Subido por</th>
+                                <th>Fecha</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Manejador para el botón de archivos
+        $(document).on('click', '.archivosCliente', function() {
+            var id = $(this).data('id');
+            var nombre = $(this).closest('tr').find('td:eq(1)').text();
+
+            $('#archivoClienteId').val(id);
+            $('#archivosClienteModalLabel').text('Archivos de ' + nombre);
+
+            // Cargar archivos inicialmente sin filtro de proyecto
+            cargarArchivos(id);
+
+            $('#archivosClienteModal').modal('show');
+        });
+
+        // Manejador para el cambio de proyecto
+        $('#proyecto_id').change(function() {
+            var usuarioId = $('#archivoClienteId').val();
+            cargarArchivos(usuarioId, $(this).val());
+        });
+
+        // Función para cargar archivos
+        function cargarArchivos(usuarioId, proyectoId = null) {
+            var url = 'archivos_logica/gestionar_archivos.php?action=listar&usuario_id=' + usuarioId;
+            if (proyectoId) {
+                url += '&proyecto_id=' + proyectoId;
+            }
+
+            $.get(url, function(data) {
+                try {
+                    var archivos = typeof data === 'string' ? JSON.parse(data) : data;
+                    var tbody = $('#archivosTable tbody');
+                    tbody.empty();
+
+                    if (Array.isArray(archivos)) {
+                        archivos.forEach(function(archivo) {
+                            var nombreArchivo = archivo.ruta_archivo.split('/').pop();
+                            var fecha = new Date(archivo.subido_en).toLocaleString();
+
+                            tbody.append(`
+                                <tr>
+                                    <td>${nombreArchivo}</td>
+                                    <td>${archivo.proyecto_nombre || 'Sin proyecto'}</td>
+                                    <td>${archivo.subido_por_nombre}</td>
+                                    <td>${fecha}</td>
+                                    <td>
+                                        <a href="archivos_logica/gestionar_archivos.php?action=descargar&archivo_id=${archivo.id}" 
+                                           class="btn btn-sm btn-primary">
+                                            <i class="bi bi-download"></i>
+                                        </a>
+                                        <button class="btn btn-sm btn-danger eliminarArchivo" 
+                                                data-id="${archivo.id}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    } else {
+                        tbody.append('<tr><td colspan="5" class="text-center">No hay archivos disponibles</td></tr>');
+                    }
+                } catch (e) {
+                    console.error('Error al procesar los archivos:', e);
+                    $('#archivosTable tbody').html('<tr><td colspan="5" class="text-center">Error al cargar los archivos</td></tr>');
+                }
+            }).fail(function() {
+                $('#archivosTable tbody').html('<tr><td colspan="5" class="text-center">Error al cargar los archivos</td></tr>');
+            });
+        }
+
+        // Manejador para subir archivos
+        $('#subirArchivoForm').submit(function(e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: 'archivos_logica/gestionar_archivos.php?action=subir',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    try {
+                        var data = typeof response === 'string' ? JSON.parse(response) : response;
+                        if (data.success) {
+                            alert('Archivo subido correctamente');
+                            $('#subirArchivoForm')[0].reset();
+                            // Recargar la lista de archivos con el proyecto actual
+                            var usuarioId = $('#archivoClienteId').val();
+                            var proyectoId = $('#proyecto_id').val();
+                            cargarArchivos(usuarioId, proyectoId);
+                        } else {
+                            alert('Error al subir el archivo: ' + (data.error || 'Error desconocido'));
+                        }
+                    } catch (e) {
+                        console.error('Error al procesar la respuesta:', e);
+                        alert('Error al procesar la respuesta del servidor');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error en la petición:', status, error);
+                    alert('Error al subir el archivo: ' + (error || 'Error desconocido'));
+                }
+            });
+        });
+
+        // Manejador para eliminar archivos
+        $(document).on('click', '.eliminarArchivo', function() {
+            if (confirm('¿Estás seguro de eliminar este archivo?')) {
+                var archivoId = $(this).data('id');
+
+                $.post('archivos_logica/gestionar_archivos.php?action=eliminar', {
+                    archivo_id: archivoId
+                }, function(response) {
+                    if (response.success) {
+                        alert('Archivo eliminado correctamente');
+                        // Recargar la lista de archivos con el proyecto actual
+                        var usuarioId = $('#archivoClienteId').val();
+                        var proyectoId = $('#proyecto_id').val();
+                        cargarArchivos(usuarioId, proyectoId);
+                    } else {
+                        alert('Error al eliminar el archivo: ' + response.error);
+                    }
+                });
+            }
+        });
+    });
+</script>
+
 <?php include 'footer.php'; ?>
