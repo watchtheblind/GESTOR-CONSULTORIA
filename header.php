@@ -46,25 +46,24 @@ try {
 </head>
 
 <body>
-  <div class="container">
-    <header>
-      <div class="branding">
-        <a href="/" aria-label="Inicio">
-          <?php if (!empty($logo_empresa)): ?>
-            <img src="<?= htmlspecialchars($logo_empresa) ?>" alt="Logo de la empresa" style="max-height: 40px;">
-          <?php else: ?>
-            <svg width="120" height="40" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
-              <rect width="120" height="40" rx="8" ry="8" fill="#004080" />
-              <circle cx="20" cy="20" r="12" fill="#ffd700" />
-              <text x="40" y="25" font-family="Arial, sans-serif" font-size="18" fill="#fff">MiApp</text>
-            </svg>
-          <?php endif; ?>
-        </a>
-      </div>
-      <span class="menu-toggle" id="menuToggle">☰</span>
-      <div class="top-actions">
-        <a href="#perfil">Mi perfil</a>
-        <a href="logout.php">Cerrar cesión</a>
-      </div>
-    </header>
-    <div class="layout">
+  <header>
+    <div class="branding">
+      <a href="/" aria-label="Inicio">
+        <?php if (!empty($logo_empresa)): ?>
+          <img src="<?= htmlspecialchars($logo_empresa) ?>" alt="Logo de la empresa" style="max-height: 40px;">
+        <?php else: ?>
+          <svg width="120" height="40" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
+            <rect width="120" height="40" rx="8" ry="8" fill="#004080" />
+            <circle cx="20" cy="20" r="12" fill="#ffd700" />
+            <text x="40" y="25" font-family="Arial, sans-serif" font-size="18" fill="#fff">MiApp</text>
+          </svg>
+        <?php endif; ?>
+      </a>
+    </div>
+    <span class="menu-toggle" id="menuToggle">☰</span>
+    <div class="top-actions">
+      <a href="#perfil">Mi perfil</a>
+      <a href="logout.php">Cerrar cesión</a>
+    </div>
+  </header>
+  <div class="layout">
