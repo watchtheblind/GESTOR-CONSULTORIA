@@ -396,7 +396,14 @@ $(document).ready(function() {
 
     $(document).on('click', '.proyectosCliente', function() {
         var id = $(this).data('id');
-        // Aquí se implementará la lógica para proyectos
-        alert('Funcionalidad de proyectos pendiente para el cliente ID: ' + id);
+        var nombre = $(this).closest('tr').find('td:eq(1)').text();
+        
+        // Asignar el ID del cliente al formulario
+        $('#proyectoClienteId').val(id);
+        $('#proyectosClienteModalLabel').text('Gestionar Proyectos - ' + nombre);
+        
+        // Mostrar el modal
+        var modal = new bootstrap.Modal(document.getElementById('proyectosClienteModal'));
+        modal.show();
     });
 });
