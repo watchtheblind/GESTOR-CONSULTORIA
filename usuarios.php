@@ -776,12 +776,13 @@ $titulo = "Gestión de Usuarios";
                                     <td>${archivo.subido_por_nombre}</td>
                                     <td>${fecha}</td>
                                     <td>
-                                        <a href="archivos_logica/gestionar_archivos.php?action=descargar&archivo_id=${archivo.id}" 
+                                        <a href="archivos_logica/gestionar_archivos.php?action=descargar&archivo_id=${archivo.id}&usuario_id=${usuarioId}" 
                                            class="btn btn-sm btn-primary">
                                             <i class="bi bi-download"></i>
                                         </a>
                                         <button class="btn btn-sm btn-danger eliminarArchivo" 
-                                                data-id="${archivo.id}">
+                                                data-id="${archivo.id}"
+                                                data-usuario-id="${usuarioId}">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>
@@ -840,16 +841,16 @@ $titulo = "Gestión de Usuarios";
         $(document).on('click', '.eliminarArchivo', function() {
             if (confirm('¿Estás seguro de eliminar este archivo?')) {
                 var archivoId = $(this).data('id');
+                var usuarioId = $(this).data('usuario-id');
 
                 $.post('archivos_logica/gestionar_archivos.php?action=eliminar', {
-                    archivo_id: archivoId
+                    archivo_id: archivoId,
+                    usuario_id: usuarioId
                 }, function(response) {
                     if (response.success) {
                         alert('Archivo eliminado correctamente');
-                        // Recargar la lista de archivos con el proyecto actual
-                        var usuarioId = $('#archivoClienteId').val();
-                        var proyectoId = $('#proyecto_id').val();
-                        cargarArchivos(usuarioId, proyectoId);
+                        // Recargar la página
+                        location.reload();
                     } else {
                         alert('Error al eliminar el archivo: ' + response.error);
                     }

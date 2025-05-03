@@ -42,6 +42,17 @@ switch ($action) {
                     throw new Exception('El archivo excede el tamaño máximo permitido de 10MB');
                 }
 
+                // Verificar si el archivo ya existe para este usuario
+                $nombre_archivo = basename($archivo['name']);
+                $ruta_completa = "../uploads/usuarios/$usuario_id/" . $nombre_archivo;
+
+                // Verificar en la base de datos si ya existe un archivo con el mismo nombre para este usuario
+                $stmt = $conn->prepare("SELECT COUNT(*) FROM archivos WHERE pertenece_a = ? AND ruta_archivo LIKE ?");
+                $stmt->execute([$usuario_id, "%$nombre_archivo"]);
+                if ($stmt->fetchColumn() > 0) {
+                    throw new Exception('Ya existe un archivo con el mismo nombre para este usuario');
+                }
+
                 $directorio_usuario = "../uploads/usuarios/$usuario_id";
 
                 // Crear directorio si no existe
@@ -51,17 +62,13 @@ switch ($action) {
                     }
                 }
 
-                // Generar nombre único para el archivo
-                $nombre_archivo = basename($archivo['name']);
-                $ruta_completa = $directorio_usuario . '/' . $nombre_archivo;
-
                 if (!move_uploaded_file($archivo['tmp_name'], $ruta_completa)) {
                     throw new Exception('Error al mover el archivo al directorio de destino');
                 }
 
                 // Guardar en la base de datos
-                $stmt = $conn->prepare("INSERT INTO archivos (proyecto_id, subido_por, ruta_archivo) VALUES (?, ?, ?)");
-                if (!$stmt->execute([$proyecto_id, $_SESSION['id'], $ruta_completa])) {
+                $stmt = $conn->prepare("INSERT INTO archivos (pertenece_a, proyecto_id, subido_por, ruta_archivo) VALUES (?, ?, ?, ?)");
+                if (!$stmt->execute([$usuario_id, $proyecto_id, $_SESSION['id'], $ruta_completa])) {
                     // Si falla la inserción en la BD, eliminar el archivo subido
                     unlink($ruta_completa);
                     throw new Exception('Error al guardar el registro en la base de datos');
@@ -83,12 +90,22 @@ switch ($action) {
                 exit();
             }
 
-            // Obtener la ruta del archivo
-            $stmt = $conn->prepare("SELECT ruta_archivo FROM archivos WHERE id = ?");
+            // Verificar que el archivo pertenece al usuario correcto
+            $stmt = $conn->prepare("SELECT ruta_archivo, pertenece_a FROM archivos WHERE id = ?");
             $stmt->execute([$archivo_id]);
             $archivo = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($archivo && file_exists($archivo['ruta_archivo'])) {
+            if (!$archivo) {
+                echo json_encode(['error' => 'Archivo no encontrado']);
+                exit();
+            }
+
+            if ($archivo['pertenece_a'] != $_POST['usuario_id']) {
+                echo json_encode(['error' => 'No tienes permiso para eliminar este archivo']);
+                exit();
+            }
+
+            if (file_exists($archivo['ruta_archivo'])) {
                 unlink($archivo['ruta_archivo']);
             }
 
@@ -102,26 +119,27 @@ switch ($action) {
 
     case 'descargar':
         $archivo_id = $_GET['archivo_id'] ?? null;
+        $usuario_id = $_GET['usuario_id'] ?? null;
 
-        if (!$archivo_id) {
-            echo json_encode(['error' => 'ID de archivo no proporcionado']);
+        if (!$archivo_id || !$usuario_id) {
+            echo json_encode(['error' => 'ID de archivo o usuario no proporcionado']);
             exit();
         }
 
-        // Obtener la ruta del archivo
-        $stmt = $conn->prepare("SELECT ruta_archivo FROM archivos WHERE id = ?");
-        $stmt->execute([$archivo_id]);
+        // Verificar que el archivo pertenece al usuario correcto
+        $stmt = $conn->prepare("SELECT ruta_archivo FROM archivos WHERE id = ? AND pertenece_a = ?");
+        $stmt->execute([$archivo_id, $usuario_id]);
         $archivo = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($archivo && file_exists($archivo['ruta_archivo'])) {
-            header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename="' . basename($archivo['ruta_archivo']) . '"');
-            readfile($archivo['ruta_archivo']);
-            exit();
-        } else {
+        if (!$archivo || !file_exists($archivo['ruta_archivo'])) {
             echo json_encode(['error' => 'Archivo no encontrado']);
+            exit();
         }
-        break;
+
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename="' . basename($archivo['ruta_archivo']) . '"');
+        readfile($archivo['ruta_archivo']);
+        exit();
 
     case 'listar':
         try {
@@ -132,15 +150,16 @@ switch ($action) {
                 throw new Exception('ID de usuario no proporcionado');
             }
 
-            $sql = "SELECT a.*, u.nombre_usuario as subido_por_nombre, p.nombre as proyecto_nombre 
+            // Consulta para obtener archivos del usuario
+            $sql = "SELECT a.*, u.nombre_usuario as subido_por_nombre, p.nombre as proyecto_nombre
                    FROM archivos a 
                    LEFT JOIN usuarios u ON a.subido_por = u.id 
-                   LEFT JOIN proyectos p ON a.proyecto_id = p.id 
-                   WHERE a.subido_por = ?";
+                   LEFT JOIN proyectos p ON a.proyecto_id = p.id
+                   WHERE a.pertenece_a = ?";
 
             $params = [$usuario_id];
 
-            if ($proyecto_id) {
+            if ($proyecto_id && $proyecto_id !== '') {
                 $sql .= " AND a.proyecto_id = ?";
                 $params[] = $proyecto_id;
             }
