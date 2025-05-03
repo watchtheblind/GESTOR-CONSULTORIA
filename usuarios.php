@@ -386,12 +386,12 @@ $titulo = "Gestión de Usuarios";
                 <h5 class="modal-title" id="mensajeModalLabel">Enviar Mensaje al Consultor</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="mensajeForm">
+            <form action="enviar_mensaje.php" method="POST">
                 <div class="modal-body">
-                    <input type="hidden" id="mensajeConsultorId" name="consultor_id">
+                    <input type="hidden" name="receptor_id" id="mensajeConsultorId">
                     <div class="mb-3">
-                        <label for="contenidoMensaje" class="form-label">Mensaje</label>
-                        <textarea class="form-control" id="contenidoMensaje" name="contenido" rows="5" required></textarea>
+                        <label for="mensaje" class="form-label">Mensaje</label>
+                        <textarea class="form-control" id="mensaje" name="mensaje" rows="4" required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">

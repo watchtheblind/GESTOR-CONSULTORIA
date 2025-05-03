@@ -1,18 +1,32 @@
 <?php
 // dashboard.php
-session_start();
 require_once 'database.php';
 require_once 'auth_functions.php';
 
-if (!isset($_SESSION['user_id']) || !checkSessionExpiration()) {
+// Verificar si el usuario está logueado
+if (!isLoggedIn()) {
+    header('Location: index.php');
+    exit();
+}
+
+// Verificar expiración de sesión
+if (!checkSessionExpiration()) {
     header('Location: index.php');
     exit();
 }
 
 // Obtener datos del usuario actual
 $stmt = $conn->prepare("SELECT nombre_usuario, rol FROM usuarios WHERE id = ?");
-$stmt->execute([$_SESSION['user_id']]);
+$stmt->execute([$_SESSION['id']]);
 $user = $stmt->fetch();
+
+// Si no se encuentra el usuario, redirigir al login
+if (!$user) {
+    session_unset();
+    session_destroy();
+    header('Location: index.php');
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
