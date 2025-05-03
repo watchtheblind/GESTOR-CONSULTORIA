@@ -20,20 +20,24 @@ try {
     $stmt->execute([$cliente_id]);
     $proyectos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    foreach ($proyectos as $proyecto) {
-        echo '<tr>';
-        echo '<td>' . htmlspecialchars($proyecto['nombre']) . '</td>';
-        echo '<td>' . htmlspecialchars($proyecto['descripcion']) . '</td>';
-        echo '<td>' . htmlspecialchars($proyecto['estado']) . '</td>';
-        echo '<td>';
-        if ($proyecto['estado'] === 'Activo') {
-            echo '<form action="cerrar_proyecto.php" method="POST" style="display:inline;">';
-            echo '<input type="hidden" name="proyecto_id" value="' . $proyecto['id'] . '">';
-            echo '<button type="submit" class="btn btn-sm btn-danger">Cerrar Proyecto</button>';
-            echo '</form>';
+    if (empty($proyectos)) {
+        echo '<tr><td colspan="4" class="text-center">Sin proyectos para mostrar</td></tr>';
+    } else {
+        foreach ($proyectos as $proyecto) {
+            echo '<tr>';
+            echo '<td>' . htmlspecialchars($proyecto['nombre']) . '</td>';
+            echo '<td>' . htmlspecialchars($proyecto['descripcion']) . '</td>';
+            echo '<td>' . htmlspecialchars($proyecto['estado']) . '</td>';
+            echo '<td>';
+            if ($proyecto['estado'] === 'Activo') {
+                echo '<form action="cerrar_proyecto.php" method="POST" style="display:inline;">';
+                echo '<input type="hidden" name="proyecto_id" value="' . $proyecto['id'] . '">';
+                echo '<button type="submit" class="btn btn-sm btn-danger">Cerrar Proyecto</button>';
+                echo '</form>';
+            }
+            echo '</td>';
+            echo '</tr>';
         }
-        echo '</td>';
-        echo '</tr>';
     }
 } catch (PDOException $e) {
     echo '<tr><td colspan="4">Error al cargar los proyectos</td></tr>';
