@@ -51,6 +51,32 @@ $(document).ready(function() {
         }
     });
 
+    // Inicializar DataTable de Clientes
+    var clientesTable = $('#clientesTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: 'clientes_datatables.php',
+            type: 'POST'
+        },
+        columns: [
+            { data: 0 },
+            { data: 1 },
+            { data: 2 },
+            { data: 3 },
+            { data: 4 },
+            { data: 5 },
+            { 
+                data: 6,
+                orderable: false,
+                searchable: false
+            }
+        ],
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json'
+        }
+    });
+
     // Mostrar modal para nuevo usuario
     $('#usuarioModal').on('show.bs.modal', function() {
         $('#usuarioForm')[0].reset();
@@ -309,5 +335,24 @@ $(document).ready(function() {
         var id = $(this).data('id');
         $('#consultorPrincipalId').val(id);
         $('#colaboradoresModal').modal('show');
+    });
+
+    // Manejadores de eventos para los botones de clientes
+    $(document).on('click', '.mensajeCliente', function() {
+        var id = $(this).data('id');
+        // Aquí se implementará la lógica para mensajes
+        alert('Funcionalidad de mensajes pendiente para el cliente ID: ' + id);
+    });
+
+    $(document).on('click', '.archivosCliente', function() {
+        var id = $(this).data('id');
+        // Aquí se implementará la lógica para archivos
+        alert('Funcionalidad de archivos pendiente para el cliente ID: ' + id);
+    });
+
+    $(document).on('click', '.proyectosCliente', function() {
+        var id = $(this).data('id');
+        // Aquí se implementará la lógica para proyectos
+        alert('Funcionalidad de proyectos pendiente para el cliente ID: ' + id);
     });
 });

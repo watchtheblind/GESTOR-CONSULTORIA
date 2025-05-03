@@ -32,7 +32,7 @@ $titulo = "Gestión de Usuarios";
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="otros-tab" data-bs-toggle="tab" data-bs-target="#otros" type="button" role="tab" aria-controls="otros" aria-selected="false">
-                    <i class="fas fa-ellipsis-h me-1"></i> Otros
+                    <i class="fas fa-ellipsis-h me-1"></i> Clientes
                 </button>
             </li>
         </ul>
@@ -104,9 +104,29 @@ $titulo = "Gestión de Usuarios";
             <!-- Pestaña de Otros -->
             <div class="tab-pane fade" id="otros" role="tabpanel" aria-labelledby="otros-tab">
                 <div class="card mb-4">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-users me-1"></i>
+                                Listado de Clientes
+                            </div>
+                        </div>
+                    </div>
                     <div class="card-body">
-                        <h5 class="card-title">Otras Funcionalidades</h5>
-                        <p class="card-text">Contenido pendiente para otras funcionalidades.</p>
+                        <table id="clientesTable" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre Cliente</th>
+                                    <th>Correo Electrónico</th>
+                                    <th>Teléfono</th>
+                                    <th>Estado</th>
+                                    <th>Creado En</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
