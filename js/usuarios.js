@@ -354,8 +354,8 @@ $(document).ready(function() {
     // Manejador para el botón "Ir al Chat"
     $('#irAlChat').click(function() {
         var clienteId = $('#mensajesClienteModal').data('cliente-id');
-        // Aquí se implementará la redirección al chat
-        alert('Redirigiendo al chat del cliente ID: ' + clienteId);
+        // Redirigir a chat.php con el ID del cliente como receptor
+        window.location.href = 'chat.php?receptor_id=' + clienteId;
     });
 
     // Manejador para el botón "Eliminar Chat"
