@@ -574,9 +574,9 @@ $titulo = "Gestión de Usuarios";
             </div>
             <div class="modal-body">
                 <!-- Tabla de Proyectos Existentes -->
-                <div class="table-responsive mb-4">
+                <div class="table-responsive mb-4" style="max-height: 300px; overflow-y: auto;">
                     <table class="table table-striped">
-                        <thead>
+                        <thead style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 1;">
                             <tr>
                                 <th>Nombre</th>
                                 <th>Descripción</th>
