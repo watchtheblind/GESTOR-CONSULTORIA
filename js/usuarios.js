@@ -362,8 +362,29 @@ $(document).ready(function() {
     $('#eliminarChat').click(function() {
         var clienteId = $('#mensajesClienteModal').data('cliente-id');
         if (confirm('¿Estás seguro de eliminar el chat con este cliente?')) {
-            // Aquí se implementará la eliminación del chat
-            alert('Chat eliminado para el cliente ID: ' + clienteId);
+            $.ajax({
+                url: 'eliminar_chat.php',
+                type: 'POST',
+                data: { cliente_id: clienteId },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        // Cerrar el modal después de eliminar
+                        $('#mensajesClienteModal').modal('hide');
+                    } else {
+                        alert('Error: ' + (response.error || 'Error desconocido'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        alert('Error: ' + (response.error || 'Error desconocido'));
+                    } catch (e) {
+                        alert('Error al procesar la respuesta del servidor');
+                    }
+                }
+            });
         }
     });
 
