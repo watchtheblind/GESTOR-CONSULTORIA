@@ -259,8 +259,38 @@ $(document).ready(function() {
 
     $(document).on('click', '.retirarCliente', function() {
         var id = $(this).data('id');
-        // Aquí iría la lógica para retirar cliente
-        alert('Función de retirar cliente pendiente');
+        $('#retirarConsultorId').val(id);
+        $('#retirarClienteModal').modal('show');
+    });
+
+    // Manejar el envío del formulario de retirar cliente
+    $('#retirarClienteForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        var formData = {
+            action: 'retirar_cliente',
+            consultor_id: $('#retirarConsultorId').val(),
+            cliente_id: $('#selectClientesAsignados').val()
+        };
+
+        $.ajax({
+            url: 'usuarios_actions.php',
+            method: 'POST',
+            data: formData,
+            success: function(response) {
+                if (response.success) {
+                    $('#retirarClienteModal').modal('hide');
+                    $('#consultoresTable').DataTable().ajax.reload();
+                    alert('Cliente retirado correctamente');
+                } else {
+                    alert('Error: ' + response.error);
+                }
+            },
+            error: function(xhr) {
+                var response = JSON.parse(xhr.responseText);
+                alert('Error: ' + response.error);
+            }
+        });
     });
 
     $(document).on('click', '.enviarMensaje', function() {

@@ -285,8 +285,12 @@ $titulo = "Gestión de Usuarios";
                             // Consulta para obtener los clientes disponibles
                             $query = "SELECT c.id, c.nombre, c.correo_contacto
                                      FROM clientes c
-                                     LEFT JOIN cliente_consultor cc ON c.id = cc.cliente_id AND cc.consultor_id = ?
-                                     WHERE cc.id IS NULL";
+                                     WHERE NOT EXISTS (
+                                         SELECT 1 
+                                         FROM cliente_consultor cc 
+                                         WHERE cc.cliente_id = c.id 
+                                         AND cc.consultor_id = ?
+                                     )";
 
                             $stmt = $conn->prepare($query);
                             $stmt->execute([$consultor_id]);
@@ -365,10 +369,6 @@ $titulo = "Gestión de Usuarios";
                 <div class="modal-body">
                     <input type="hidden" id="mensajeConsultorId" name="consultor_id">
                     <div class="mb-3">
-                        <label for="asuntoMensaje" class="form-label">Asunto</label>
-                        <input type="text" class="form-control" id="asuntoMensaje" name="asunto" required>
-                    </div>
-                    <div class="mb-3">
                         <label for="contenidoMensaje" class="form-label">Mensaje</label>
                         <textarea class="form-control" id="contenidoMensaje" name="contenido" rows="5" required></textarea>
                     </div>
@@ -382,41 +382,116 @@ $titulo = "Gestión de Usuarios";
     </div>
 </div>
 
-<!-- Modal para Asignar Tarea -->
+<!-- Modal para Tareas -->
 <div class="modal fade" id="tareaModal" tabindex="-1" aria-labelledby="tareaModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="tareaModalLabel">Asignar Tarea al Consultor</h5>
+                <h5 class="modal-title" id="tareaModalLabel">Nueva Tarea</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="tareaForm">
+            <form method="POST" action="crear_tarea.php">
                 <div class="modal-body">
-                    <input type="hidden" id="tareaConsultorId" name="consultor_id">
+                    <input type="hidden" name="asignado_a" id="tareaConsultorId">
                     <div class="mb-3">
-                        <label for="tituloTarea" class="form-label">Título</label>
-                        <input type="text" class="form-control" id="tituloTarea" name="titulo" required>
+                        <label for="proyecto_id" class="form-label">Proyecto</label>
+                        <select class="form-select" id="proyecto_id" name="proyecto_id" required>
+                            <option value="">Seleccione un proyecto</option>
+                            <?php
+                            // Consulta para obtener los proyectos activos
+                            $query = "SELECT p.id, p.nombre, p.descripcion, 
+                                    u.nombre_usuario as nombre_cliente
+                                    FROM proyectos p
+                                    LEFT JOIN usuarios u ON p.cliente_id = u.id
+                                    WHERE p.estado = 'Activo'
+                                    ORDER BY p.nombre ASC";
+
+                            $stmt = $conn->prepare($query);
+                            $stmt->execute();
+                            $proyectos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                            foreach ($proyectos as $proyecto) {
+                                printf(
+                                    '<option value="%d">%s - Cliente: %s</option>',
+                                    $proyecto['id'],
+                                    htmlspecialchars($proyecto['nombre']),
+                                    htmlspecialchars($proyecto['nombre_cliente'] ?? 'Sin asignar')
+                                );
+                            }
+                            ?>
+                        </select>
                     </div>
                     <div class="mb-3">
-                        <label for="descripcionTarea" class="form-label">Descripción</label>
-                        <textarea class="form-control" id="descripcionTarea" name="descripcion" rows="5" required></textarea>
+                        <label for="descripcion" class="form-label">Descripción de la Tarea</label>
+                        <textarea class="form-control" id="descripcion" name="descripcion" rows="4" required></textarea>
                     </div>
                     <div class="mb-3">
-                        <label for="fechaVencimiento" class="form-label">Fecha de Vencimiento</label>
-                        <input type="date" class="form-control" id="fechaVencimiento" name="fecha_vencimiento" required>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="esta_completada" name="esta_completada" value="1">
+                            <label class="form-check-label" for="esta_completada">
+                                Tarea Completada
+                            </label>
+                        </div>
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Tarea</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Retirar Cliente -->
+<div class="modal fade" id="retirarClienteModal" tabindex="-1" aria-labelledby="retirarClienteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="retirarClienteModalLabel">Retirar Cliente del Consultor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="retirarClienteForm" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" id="retirarConsultorId" name="consultor_id">
                     <div class="mb-3">
-                        <label for="prioridadTarea" class="form-label">Prioridad</label>
-                        <select class="form-select" id="prioridadTarea" name="prioridad" required>
-                            <option value="baja">Baja</option>
-                            <option value="media" selected>Media</option>
-                            <option value="alta">Alta</option>
+                        <label for="selectClientesAsignados" class="form-label">Clientes Asignados</label>
+                        <select id="selectClientesAsignados" class="form-select" name="cliente_id" required>
+                            <option value="">Seleccione un cliente</option>
+                            <?php
+                            // Obtener el ID del consultor del formulario
+                            $consultor_id = isset($_POST['consultor_id']) ? $_POST['consultor_id'] : null;
+
+                            if ($consultor_id) {
+                                // Consulta para obtener los IDs de cliente_consultor
+                                $query = "SELECT cc.id, cc.cliente_id, cc.consultor_id, cc.fecha_asignacion
+                                         FROM cliente_consultor cc
+                                         WHERE cc.consultor_id = ?
+                                         ORDER BY cc.fecha_asignacion DESC";
+
+                                $stmt = $conn->prepare($query);
+                                $stmt->execute([$consultor_id]);
+                                $asignaciones = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                                foreach ($asignaciones as $asignacion) {
+                                    printf(
+                                        '<option value="%d">ID Asignación: %d - Cliente ID: %d - Fecha: %s</option>',
+                                        $asignacion['id'],
+                                        $asignacion['id'],
+                                        $asignacion['cliente_id'],
+                                        $asignacion['fecha_asignacion']
+                                    );
+                                }
+                            } else {
+                                echo '<option value="" disabled>No hay ID de consultor seleccionado</option>';
+                            }
+                            ?>
                         </select>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Asignar Tarea</button>
+                    <button type="submit" class="btn btn-danger">Retirar Cliente</button>
                 </div>
             </form>
         </div>
