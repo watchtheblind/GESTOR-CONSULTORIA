@@ -411,4 +411,53 @@ $(document).ready(function() {
         var modal = new bootstrap.Modal(document.getElementById('proyectosClienteModal'));
         modal.show();
     });
+
+    // Manejador para el botón de tareas de cliente
+    $(document).on('click', '.tareaCliente', function(e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        var nombre = $(this).closest('tr').find('td:eq(1)').text();
+        
+        console.log('ID del cliente:', id); // Para depuración
+        
+        // Asignar el ID del cliente al formulario
+        $('#tareaClienteId').val(id);
+        console.log('Valor del campo oculto:', $('#tareaClienteId').val()); // Para depuración
+        
+        $('#tareaClienteModalLabel').text('Asignar Tarea - ' + nombre);
+        
+        // Mostrar el modal
+        var modal = new bootstrap.Modal(document.getElementById('tareaClienteModal'));
+        modal.show();
+    });
+
+    // Manejador del formulario de tareas
+    $('#tareaClienteForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        var formData = $(this).serialize();
+        
+        $.ajax({
+            url: 'crear_tarea.php',
+            type: 'POST',
+            data: formData,
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    alert(response.message);
+                    $('#tareaClienteModal').modal('hide');
+                } else {
+                    alert('Error: ' + (response.error || 'Error desconocido'));
+                }
+            },
+            error: function(xhr, status, error) {
+                try {
+                    var response = JSON.parse(xhr.responseText);
+                    alert('Error: ' + (response.error || 'Error desconocido'));
+                } catch (e) {
+                    alert('Error al procesar la respuesta del servidor');
+                }
+            }
+        });
+    });
 });

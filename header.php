@@ -1,5 +1,18 @@
 <?php
 // header.php
+require_once 'database.php';
+
+// Obtener el logo de la empresa desde la base de datos
+$logo_empresa = '';
+try {
+  $stmt = $conn->query("SELECT valor FROM configuraciones_sistema WHERE clave = 'logo_empresa'");
+  $result = $stmt->fetch(PDO::FETCH_ASSOC);
+  if ($result) {
+    $logo_empresa = $result['valor'];
+  }
+} catch (PDOException $e) {
+  // Si hay error, se mantiene el logo por defecto
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -37,12 +50,15 @@
     <header>
       <div class="branding">
         <a href="/" aria-label="Inicio">
-          <!-- SVG embebido -->
-          <svg width="120" height="40" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
-            <rect width="120" height="40" rx="8" ry="8" fill="#004080" />
-            <circle cx="20" cy="20" r="12" fill="#ffd700" />
-            <text x="40" y="25" font-family="Arial, sans-serif" font-size="18" fill="#fff">MiApp</text>
-          </svg>
+          <?php if (!empty($logo_empresa)): ?>
+            <img src="<?= htmlspecialchars($logo_empresa) ?>" alt="Logo de la empresa" style="max-height: 40px;">
+          <?php else: ?>
+            <svg width="120" height="40" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
+              <rect width="120" height="40" rx="8" ry="8" fill="#004080" />
+              <circle cx="20" cy="20" r="12" fill="#ffd700" />
+              <text x="40" y="25" font-family="Arial, sans-serif" font-size="18" fill="#fff">MiApp</text>
+            </svg>
+          <?php endif; ?>
         </a>
       </div>
       <span class="menu-toggle" id="menuToggle">☰</span>

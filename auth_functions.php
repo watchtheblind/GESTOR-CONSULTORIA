@@ -22,7 +22,16 @@ if (!function_exists('checkSessionExpiration')) {
             return true;
         }
 
-        $inactive = 3600; // 1 hora en segundos
+        // Obtener el tiempo de sesión desde la base de datos
+        global $conn;
+        try {
+            $stmt = $conn->query("SELECT valor FROM configuraciones_sistema WHERE clave = 'tiempo_sesion'");
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $inactive = ($result ? intval($result['valor']) : 30) * 60; // Convertir minutos a segundos
+        } catch (PDOException $e) {
+            $inactive = 30 * 60; // Valor por defecto: 30 minutos
+        }
+
         if (time() - $_SESSION['last_activity'] > $inactive) {
             session_unset();
             session_destroy();

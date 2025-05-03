@@ -84,6 +84,9 @@ try {
                 <button class="btn btn-sm btn-success proyectosCliente" data-id="' . $row['id'] . '" title="Proyectos">
                     <i class="bi bi-kanban"></i>
                 </button>
+                <button class="btn btn-sm btn-warning tareaCliente" data-id="' . $row['id'] . '" title="Tareas">
+                    <i class="bi bi-list-check"></i>
+                </button>
             </div>';
 
         $response['data'][] = [

@@ -619,4 +619,65 @@ $titulo = "Gestión de Usuarios";
     </div>
 </div>
 
+<!-- Modal para Tareas de Cliente -->
+<div class="modal fade" id="tareaClienteModal" tabindex="-1" aria-labelledby="tareaClienteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tareaClienteModalLabel">Asignar Tarea</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="crear_tarea.php" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="asignado_a" id="tareaClienteId" value="">
+                    <div class="mb-3">
+                        <label for="proyecto_id" class="form-label">Proyecto</label>
+                        <select class="form-select" id="proyecto_id" name="proyecto_id" required>
+                            <option value="">Seleccione un proyecto</option>
+                            <?php
+                            // Consulta para obtener los proyectos activos
+                            $query = "SELECT p.id, p.nombre, p.descripcion, 
+                                    u.nombre_usuario as nombre_cliente
+                                    FROM proyectos p
+                                    LEFT JOIN usuarios u ON p.cliente_id = u.id
+                                    WHERE p.estado = 'Activo'
+                                    ORDER BY p.nombre ASC";
+
+                            $stmt = $conn->prepare($query);
+                            $stmt->execute();
+                            $proyectos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                            foreach ($proyectos as $proyecto) {
+                                printf(
+                                    '<option value="%d">%s - Cliente: %s</option>',
+                                    $proyecto['id'],
+                                    htmlspecialchars($proyecto['nombre']),
+                                    htmlspecialchars($proyecto['nombre_cliente'] ?? 'Sin asignar')
+                                );
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción de la Tarea</label>
+                        <textarea class="form-control" id="descripcion" name="descripcion" rows="4" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="esta_completada" name="esta_completada" value="1">
+                            <label class="form-check-label" for="esta_completada">
+                                Tarea Completada
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Tarea</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <?php include 'footer.php'; ?>
