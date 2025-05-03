@@ -225,8 +225,18 @@ $(document).ready(function() {
                 }
             },
             error: function(xhr, status, error) {
-                console.error('AJAX Error:', status, error);
-                alert('Error al comunicarse con el servidor');
+                try {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response.error) {
+                        alert(response.error);
+                    } else {
+                        console.error('AJAX Error:', status, error);
+                        alert('Error al comunicarse con el servidor');
+                    }
+                } catch (e) {
+                    console.error('Error procesando la respuesta:', e);
+                    alert('Error al procesar la respuesta del servidor');
+                }
             }
         });
     });

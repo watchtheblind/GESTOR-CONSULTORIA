@@ -36,6 +36,13 @@ try {
                 throw new Exception("La contraseña es requerida para nuevos usuarios");
             }
 
+            // Verificar si el email ya existe
+            $stmt = $conn->prepare("SELECT id FROM usuarios WHERE correo_electronico = ?");
+            $stmt->execute([trim($_POST['correo_electronico'])]);
+            if ($stmt->fetch()) {
+                throw new Exception("Este email ya está en uso");
+            }
+
             $data = [
                 'nombre_usuario' => trim($_POST['nombre_usuario']),
                 'correo_electronico' => trim($_POST['correo_electronico']),
@@ -75,6 +82,13 @@ try {
                 if (empty($_POST[$field])) {
                     throw new Exception("El campo $field es requerido");
                 }
+            }
+
+            // Verificar si el email ya existe en otro usuario
+            $stmt = $conn->prepare("SELECT id FROM usuarios WHERE correo_electronico = ? AND id != ?");
+            $stmt->execute([trim($_POST['correo_electronico']), $_POST['usuario_id']]);
+            if ($stmt->fetch()) {
+                throw new Exception("Este email ya está en uso");
             }
 
             $data = [
