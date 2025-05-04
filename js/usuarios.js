@@ -447,7 +447,7 @@ $(document).ready(function() {
         var formData = $(this).serialize();
         
         $.ajax({
-            url: 'crear_tarea.php',
+            url: 'tareas/crear_tarea.php',
             type: 'POST',
             data: formData,
             dataType: 'json',
