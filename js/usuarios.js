@@ -4,7 +4,7 @@ $(document).ready(function() {
         processing: true,
         serverSide: true,
         ajax: {
-            url: 'usuarios_datatables.php',
+            url: 'usuarios/usuarios_datatables.php',
             type: 'POST'
         },
         columns: [
@@ -30,7 +30,7 @@ $(document).ready(function() {
         processing: true,
         serverSide: true,
         ajax: {
-            url: 'consultores_datatables.php',
+            url: 'usuarios/consultores_datatables.php',
             type: 'POST'
         },
         columns: [
@@ -56,7 +56,7 @@ $(document).ready(function() {
         processing: true,
         serverSide: true,
         ajax: {
-            url: 'clientes_datatables.php',
+            url: 'usuarios/clientes_datatables.php',
             type: 'POST'
         },
         columns: [
@@ -91,7 +91,7 @@ $(document).ready(function() {
     $(document).on('click', '.editarUsuario', function() {
         var id = $(this).data('id');
         $.ajax({
-            url: 'usuarios_actions.php',
+            url: 'usuarios/usuarios_actions.php',
             type: 'POST',
             data: { 
                 action: 'get',
@@ -142,7 +142,7 @@ $(document).ready(function() {
         var action = 'update'; // Como es modal de editar, se asume update
 
         $.ajax({
-            url: 'usuarios_actions.php',
+            url: 'usuarios/usuarios_actions.php',
             type: 'POST',
             data: formData + '&action=' + action,
             success: function(response) {
@@ -171,7 +171,7 @@ $(document).ready(function() {
             var id = $(this).data('id');
             
             $.ajax({
-                url: 'usuarios_actions.php',
+                url: 'usuarios/usuarios_actions.php',
                 type: 'POST',
                 data: { 
                     action: 'delete', 
@@ -206,7 +206,7 @@ $(document).ready(function() {
         var action = $('#usuario_id').val() ? 'update' : 'create';
         
         $.ajax({
-            url: 'usuarios_actions.php',
+            url: 'usuarios/usuarios_actions.php',
             type: 'POST',
             data: formData + '&action=' + action,
             success: function(response) {
@@ -272,7 +272,7 @@ $(document).ready(function() {
     $('#recuperarForm').submit(function(e) {
         e.preventDefault(); // Evita el comportamiento por defecto del formulario
 
-        $.post('usuarios_actions.php', {
+        $.post('usuarios/usuarios_actions.php', {
             action: 'recover',
             usuario_id: $('#recuperar_id').val(),
             nueva_contrasena: $('#nueva_contrasena').val()
@@ -310,7 +310,7 @@ $(document).ready(function() {
         };
 
         $.ajax({
-            url: 'usuarios_actions.php',
+            url: 'usuarios/usuarios_actions.php',
             method: 'POST',
             data: formData,
             success: function(response) {
