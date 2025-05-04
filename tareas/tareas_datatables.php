@@ -2,12 +2,6 @@
 session_start();
 require_once '../database.php';
 
-// Solo permitir acceso a roles autorizados
-if ($_SESSION['rol'] === 'Consultor Colaborador') {
-    http_response_code(403);
-    exit();
-}
-
 header('Content-Type: application/json');
 
 // Parámetros de DataTables
@@ -15,6 +9,7 @@ $start = $_POST['start'] ?? 0;
 $length = $_POST['length'] ?? 10;
 $search = $_POST['search']['value'] ?? '';
 $draw = $_POST['draw'] ?? 1;
+$filter = $_POST['filter'] ?? 'all';
 
 // Columnas a ordenar
 $orderColumn = $_POST['order'][0]['column'] ?? 0;
@@ -48,6 +43,22 @@ $query = "SELECT SQL_CALC_FOUND_ROWS
 // Filtros
 $where = [];
 $params = [];
+
+// Filtro por estado
+if ($filter === 'pending') {
+    $where[] = "t.esta_completada = 0";
+} elseif ($filter === 'completed') {
+    $where[] = "t.esta_completada = 1";
+}
+
+// Filtro por rol
+if ($_SESSION['rol'] === 'Cliente') {
+    $where[] = "t.asignado_a = ?";
+    $params[] = $_SESSION['user_id'];
+} elseif ($_SESSION['rol'] === 'Consultor Principal') {
+    $where[] = "(t.asignado_a = ? OR u.rol = 'Cliente')";
+    $params[] = $_SESSION['user_id'];
+}
 
 if (!empty($search)) {
     $where[] = "(p.nombre LIKE ? OR u.nombre_usuario LIKE ? OR u.rol LIKE ? OR t.descripcion LIKE ?)";
@@ -83,6 +94,7 @@ $response = [
 foreach ($resultados as $row) {
     $acciones = '<div class="btn-group" role="group">';
 
+    // Botones según rol
     if ($_SESSION['rol'] === 'Administrador' || $_SESSION['rol'] === 'Subadministrador') {
         $acciones .= '
             <button class="btn btn-sm btn-warning" title="Editar">
@@ -91,6 +103,13 @@ foreach ($resultados as $row) {
             <button class="btn btn-sm btn-danger" title="Eliminar">
                 <i class="bi bi-trash"></i>
             </button>';
+    } elseif ($_SESSION['rol'] === 'Consultor Principal' || $_SESSION['rol'] === 'Cliente') {
+        if ($row['estado'] === 'Pendiente') {
+            $acciones .= '
+                <button class="btn btn-sm btn-success" title="Marcar como completada">
+                    <i class="bi bi-check"></i>
+                </button>';
+        }
     }
 
     $acciones .= '</div>';

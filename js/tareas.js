@@ -5,7 +5,10 @@ $(document).ready(function() {
         serverSide: true,
         ajax: {
             url: 'tareas/tareas_datatables.php',
-            type: 'POST'
+            type: 'POST',
+            data: function(d) {
+                d.filter = $('.btn-group .active').data('filter');
+            }
         },
         columns: [
             { data: 0 },
@@ -28,11 +31,81 @@ $(document).ready(function() {
         }
     });
 
+    // Manejador para los filtros
+    $('.btn-group button').click(function() {
+        $('.btn-group button').removeClass('active');
+        $(this).addClass('active');
+        table.ajax.reload();
+    });
+
+    // Manejador para el formulario de creación
+    $('#crearTareaForm').submit(function(e) {
+        e.preventDefault();
+        
+        var formData = $(this).serialize();
+        
+        $.ajax({
+            url: 'tareas/acciones_tareas.php',
+            type: 'POST',
+            data: formData + '&action=create',
+            dataType: 'json',
+            success: function(response) {
+                try {
+                    if (response.success) {
+                        $('#crearTareaModal').modal('hide');
+                        table.ajax.reload();
+                        alert('Tarea creada correctamente');
+                    } else {
+                        alert('Error: ' + (response.error || 'Error desconocido'));
+                    }
+                } catch (e) {
+                    console.error('Error procesando la respuesta:', e);
+                    alert('Error al procesar la respuesta del servidor');
+                }
+            },
+            error: function(xhr, status, error) {
+                try {
+                    var response = JSON.parse(xhr.responseText);
+                    alert('Error: ' + (response.error || 'Error desconocido'));
+                } catch (e) {
+                    console.error('Error en la petición:', status, error);
+                    alert('Error al comunicarse con el servidor');
+                }
+            }
+        });
+    });
+
+    // Manejador para el botón de marcar como completada
+    $(document).on('click', '.btn-success', function() {
+        var id = $(this).closest('tr').find('td:first').text();
+        
+        if (confirm('¿Estás seguro de marcar esta tarea como completada?')) {
+            $.ajax({
+                url: 'tareas/acciones_tareas.php',
+                type: 'POST',
+                data: { 
+                    action: 'complete',
+                    id: id
+                },
+                success: function(response) {
+                    if (response.success) {
+                        table.ajax.reload();
+                        alert('Tarea marcada como completada');
+                    } else {
+                        alert('Error: ' + response.error);
+                    }
+                },
+                error: function() {
+                    alert('Error al comunicarse con el servidor');
+                }
+            });
+        }
+    });
+
     // Manejador para el botón de editar
     $(document).on('click', '.btn-warning', function() {
         var id = $(this).closest('tr').find('td:first').text();
         
-        // Obtener datos de la tarea
         $.ajax({
             url: 'tareas/acciones_tareas.php',
             type: 'POST',
