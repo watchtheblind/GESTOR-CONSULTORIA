@@ -20,7 +20,7 @@ $(document).ready(function() {
                 data: 8,
                 orderable: false,
                 searchable: false,
-                visible: false
+                visible: true
             }
         ],
         language: {
@@ -28,18 +28,61 @@ $(document).ready(function() {
         }
     });
 
-    // Manejador para el botón de ver detalles
-    $(document).on('click', '.btn-info', function() {
-        var id = $(this).closest('tr').find('td:first').text();
-        // Aquí puedes implementar la lógica para ver detalles
-        console.log('Ver detalles de tarea:', id);
-    });
-
     // Manejador para el botón de editar
     $(document).on('click', '.btn-warning', function() {
         var id = $(this).closest('tr').find('td:first').text();
-        // Aquí puedes implementar la lógica para editar
-        console.log('Editar tarea:', id);
+        
+        // Obtener datos de la tarea
+        $.ajax({
+            url: 'tareas/acciones_tareas.php',
+            type: 'POST',
+            data: { 
+                action: 'get',
+                id: id
+            },
+            success: function(response) {
+                try {
+                    var tarea = response;
+                    $('#tarea_id').val(tarea.id);
+                    $('#descripcion').val(tarea.descripcion);
+                    $('#esta_completada').prop('checked', tarea.esta_completada == 1);
+                    
+                    var modal = new bootstrap.Modal(document.getElementById('editarTareaModal'));
+                    modal.show();
+                } catch (e) {
+                    console.error('Error al procesar los datos:', e);
+                    alert('Error al cargar los datos de la tarea');
+                }
+            },
+            error: function() {
+                alert('Error al comunicarse con el servidor');
+            }
+        });
+    });
+
+    // Manejador para el formulario de edición
+    $('#editarTareaForm').submit(function(e) {
+        e.preventDefault();
+        
+        var formData = $(this).serialize() + '&action=update';
+        
+        $.ajax({
+            url: 'tareas/acciones_tareas.php',
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                if (response.success) {
+                    $('#editarTareaModal').modal('hide');
+                    table.ajax.reload();
+                    alert('Tarea actualizada correctamente');
+                } else {
+                    alert('Error: ' + response.error);
+                }
+            },
+            error: function() {
+                alert('Error al comunicarse con el servidor');
+            }
+        });
     });
 
     // Manejador para el botón de eliminar
@@ -47,15 +90,18 @@ $(document).ready(function() {
         var id = $(this).closest('tr').find('td:first').text();
         if (confirm('¿Estás seguro de eliminar esta tarea?')) {
             $.ajax({
-                url: 'tareas/eliminar_tarea.php',
+                url: 'tareas/acciones_tareas.php',
                 type: 'POST',
-                data: { id: id },
+                data: { 
+                    action: 'delete',
+                    id: id
+                },
                 success: function(response) {
                     if (response.success) {
                         table.ajax.reload();
                         alert('Tarea eliminada correctamente');
                     } else {
-                        alert('Error al eliminar la tarea: ' + response.error);
+                        alert('Error: ' + response.error);
                     }
                 },
                 error: function() {

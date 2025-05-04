@@ -81,11 +81,7 @@ $response = [
 ];
 
 foreach ($resultados as $row) {
-    $acciones = '
-        <div class="btn-group" role="group">
-            <button class="btn btn-sm btn-info" title="Ver Detalles">
-                <i class="bi bi-eye"></i>
-            </button>';
+    $acciones = '<div class="btn-group" role="group">';
 
     if ($_SESSION['rol'] === 'Administrador' || $_SESSION['rol'] === 'Subadministrador') {
         $acciones .= '
